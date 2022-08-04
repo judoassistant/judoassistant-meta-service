@@ -20,5 +20,6 @@ func Init() {
 	tournamentController := controllers.NewTournamentController(tournamentService)
 	router := NewRouter(tournamentController)
 
+	router.SetTrustedProxies([]string{"127.0.0.1"})
 	router.Run("localhost:8080")
 }
