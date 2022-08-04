@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"errors"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -18,6 +18,20 @@ func NewTournamentRepository(db *sqlx.DB) *TournamentRepository {
 	return &TournamentRepository{db}
 }
 
-func (t *TournamentRepository) GetById(id int64) (*TournamentEntity, error) {
-	return nil, errors.New("Blah")
+func (repository *TournamentRepository) GetById(id int64) (*TournamentEntity, error) {
+    tournament := TournamentEntity{}
+    err := repository.db.Get(&tournament, "SELECT * FROM tournaments WHERE id = $1 LIMIT 1", id)
+	return &tournament, err
+}
+
+func (repository *TournamentRepository) GetByDateGreaterThanEqual(minimumDate time.Time, limit uint) (*[]TournamentEntity, error) {
+    tournaments := []TournamentEntity{}
+    err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE date >= $1 LIMIT $2", minimumDate, limit)
+	return &tournaments, err
+}
+
+func (repository *TournamentRepository) GetByDateLessThan(maximumDate time.Time, limit uint) (*[]TournamentEntity, error) {
+    tournaments := []TournamentEntity{}
+    err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE date < $1 LIMIT $2", maximumDate, limit)
+	return &tournaments, err
 }
