@@ -1,8 +1,9 @@
 package main
 
-import "github.com/judoassistant/judoassistant-meta-service/server"
+import (
+	"github.com/judoassistant/judoassistant-meta-service/server"
+)
 
 func main() {
-  server.Init()
+	server.Init()
 }
-
