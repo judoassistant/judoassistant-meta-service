@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/services"
 )
 
@@ -16,5 +17,9 @@ func NewTournamentController(tournamentService *services.TournamentService) *Tou
 }
 
 func (tc *TournamentController) Get(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "Hello World!"})
+	response := dto.TournamentResponseBody{
+		Name:     "Hello",
+		Location: "Foo",
+	}
+	c.JSON(http.StatusOK, response)
 }
