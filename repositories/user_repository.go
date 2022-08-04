@@ -5,9 +5,9 @@ import (
 )
 
 type UserEntity struct {
-    Email string `db:"email"`
+	Email        string `db:"email"`
 	PasswordHash string `db:"password_hash"`
-    IsAdmin      bool `db:"is_admin"`
+	IsAdmin      bool   `db:"is_admin"`
 }
 
 type UserRepository struct {
@@ -19,13 +19,13 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 }
 
 func (repository *UserRepository) GetByEmail(email string) (*UserEntity, error) {
-    user := UserEntity{}
-    err := repository.db.Get(&user, "SELECT * FROM users WHERE email = $1 LIMIT 1", email)
+	user := UserEntity{}
+	err := repository.db.Get(&user, "SELECT * FROM users WHERE email = $1 LIMIT 1", email)
 	return &user, err
 }
 
 func (repository *UserRepository) GetAll() (*[]UserEntity, error) {
-    users := []UserEntity{}
-    err := repository.db.Select(&users, "SELECT * FROM users")
+	users := []UserEntity{}
+	err := repository.db.Select(&users, "SELECT * FROM users")
 	return &users, err
 }
