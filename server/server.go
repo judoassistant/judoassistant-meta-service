@@ -17,10 +17,8 @@ func Init() {
 	}
 
 	if err := db.Migrate(database); err != nil {
-		log.Println("Test1")
 		log.Fatalln(err.Error())
 	}
-	log.Println("Test")
 
 	tournamentRepository := repositories.NewTournamentRepository(database)
 	tournamentService := services.NewTournamentService(tournamentRepository)
@@ -34,5 +32,5 @@ func Init() {
 	router := NewRouter(authMiddleware, tournamentController, userController)
 
 	router.SetTrustedProxies([]string{"127.0.0.1"})
-	router.Run("localhost:8080")
+	router.Run(":8080")
 }

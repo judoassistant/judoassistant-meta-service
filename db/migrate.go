@@ -18,7 +18,7 @@ func Migrate(db *sqlx.DB) error {
 		return err
 	}
 
-	migrate, err := migrate.NewWithDatabaseInstance("file:///db/migrations", "sqlite3", driver)
+	migrate, err := migrate.NewWithDatabaseInstance("file://db/migrations", "sqlite3", driver)
 	log.Println("Test")
 
 	return migrate.Up()
