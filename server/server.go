@@ -11,16 +11,22 @@ import (
 )
 
 func Init() {
-	db, err := db.Init()
+	database, err := db.Init()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln(err.Error())
 	}
 
-	tournamentRepository := repositories.NewTournamentRepository(db)
+	if err := db.Migrate(database); err != nil {
+		log.Println("Test1")
+		log.Fatalln(err.Error())
+	}
+	log.Println("Test")
+
+	tournamentRepository := repositories.NewTournamentRepository(database)
 	tournamentService := services.NewTournamentService(tournamentRepository)
 	tournamentController := controllers.NewTournamentController(tournamentService)
 
-	userRepository := repositories.NewUserRepository(db)
+	userRepository := repositories.NewUserRepository(database)
 	userService := services.NewUserService(userRepository)
 	userController := controllers.NewUserController(userService)
 

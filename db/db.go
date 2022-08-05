@@ -6,5 +6,5 @@ import (
 )
 
 func Init() (*sqlx.DB, error) {
-	return sqlx.Connect("sqlite3", ":memory")
+	return sqlx.Connect("sqlite3", ":memory:")
 }
