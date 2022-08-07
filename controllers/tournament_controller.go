@@ -18,10 +18,10 @@ func NewTournamentController(tournamentService *services.TournamentService) *Tou
 	return &TournamentController{tournamentService}
 }
 
-func (tc *TournamentController) Get(c *gin.Context) {
-	user := c.MustGet(middleware.AuthUserKey).(dto.UserDTO)
+func (tc *TournamentController) Index(c *gin.Context) {
+	user := c.MustGet(middleware.AuthUserKey).(*dto.UserDTO)
 	log.Println(user.Email, user.ID, user.IsAdmin)
-	response := dto.TournamentResponseBody{
+	response := dto.TournamentResponseDTO{
 		Name:     "Hello",
 		Location: "Foo",
 	}

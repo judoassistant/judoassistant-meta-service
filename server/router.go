@@ -10,8 +10,9 @@ func NewRouter(authMiddleware gin.HandlerFunc, tournamentController *controllers
 	router.Use(gin.Logger())
 	router.Use(authMiddleware)
 
-	router.GET("/tournaments", tournamentController.Get)
-	router.GET("/users", userController.Auth)
+	router.GET("/tournaments", tournamentController.Index)
+	router.GET("/users/", userController.Index)
+	router.POST("/users/register", userController.Create)
 
 	return router
 }

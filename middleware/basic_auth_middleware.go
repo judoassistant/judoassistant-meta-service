@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/services"
 )
 
@@ -18,7 +19,10 @@ func BasicAuthMiddleware(userService *services.UserService) gin.HandlerFunc {
 			return
 		}
 
-		user, err := userService.Authenticate(email, password)
+		user, err := userService.Authenticate(&dto.UserAuthenticationRequestDTO{
+			Email:    email,
+			Password: password,
+		})
 
 		if err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)

@@ -15,6 +15,10 @@ func NewUserController(userService *services.UserService) *UserController {
 	return &UserController{userService}
 }
 
-func (tc *UserController) Auth(c *gin.Context) {
+func (tc *UserController) Create(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{})
+}
+
+func (tc *UserController) Index(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
