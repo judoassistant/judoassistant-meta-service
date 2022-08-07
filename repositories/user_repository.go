@@ -31,8 +31,8 @@ func (repository *UserRepository) GetByEmail(email string) (*UserEntity, error) 
 	return &user, err
 }
 
-func (repository *UserRepository) GetAll() (*[]UserEntity, error) {
+func (repository *UserRepository) GetAll() ([]UserEntity, error) {
 	users := []UserEntity{}
 	err := repository.db.Select(&users, "SELECT * FROM users")
-	return &users, err
+	return users, err
 }

@@ -15,3 +15,13 @@ func MapUserDTO(user *repositories.UserEntity) UserDTO {
 		IsAdmin: user.IsAdmin,
 	}
 }
+
+func MapUserDTOs(users []repositories.UserEntity) []UserDTO {
+	result := make([]UserDTO, len(users))
+
+	for key, value := range users {
+		result[key] = MapUserDTO(&value)
+	}
+
+	return result
+}

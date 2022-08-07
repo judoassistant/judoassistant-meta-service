@@ -51,6 +51,16 @@ func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*
 	return &response, nil
 }
 
+func (service *UserService) GetAll() ([]dto.UserDTO, error) {
+	users, err := service.userRepository.GetAll()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return dto.MapUserDTOs(users), nil
+}
+
 func hashPassword(password string) (string, error) {
 	const cost = 14
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), cost)
