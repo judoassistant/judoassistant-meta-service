@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"log"
+
 	"github.com/jmoiron/sqlx"
 )
 
@@ -22,7 +24,14 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 }
 
 func (repository *UserRepository) Create(entity *UserEntity) error {
-	return repository.db.Get(&entity.ID, "INSERT INTO (first_name, last_name, email, password_hash, is_admin) VALUES ($1, $2, $3, $4, $5) RETURNING id", entity.FirstName, entity.LastName, entity.Email, entity.PasswordHash, entity.IsAdmin)
+	log.Println("Hello WOrld!")
+	return repository.db.Get(&entity.ID, "INSERT INTO users (first_name, last_name, email, password_hash, is_admin) VALUES ($1, $2, $3, $4, $5) RETURNING id", entity.FirstName, entity.LastName, entity.Email, entity.PasswordHash, entity.IsAdmin)
+}
+
+func (repository *UserRepository) ExistsByEmail(email string) (bool, error) {
+	var count int64
+	err := repository.db.Get(&count, "SELECT count(*) FROM users WHERE email = $1 LIMIT 1", email)
+	return count > 0, err
 }
 
 func (repository *UserRepository) GetByEmail(email string) (*UserEntity, error) {

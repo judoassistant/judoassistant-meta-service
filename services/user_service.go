@@ -51,6 +51,10 @@ func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*
 	return &response, nil
 }
 
+func (service *UserService) ExistsByEmail(email string) (bool, error) {
+	return service.userRepository.ExistsByEmail(email)
+}
+
 func (service *UserService) GetAll() ([]dto.UserDTO, error) {
 	users, err := service.userRepository.GetAll()
 
