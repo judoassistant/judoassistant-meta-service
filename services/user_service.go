@@ -14,19 +14,41 @@ func NewUserService(userRepository *repositories.UserRepository) *UserService {
 	return &UserService{userRepository}
 }
 
-func (service *UserService) Authenticate(email string, password string) (*dto.UserDTO, error) {
-	userEntity, err := service.userRepository.GetByEmail(email)
+func (service *UserService) Authenticate(request *dto.UserAuthenticationRequestDTO) (*dto.UserDTO, error) {
+	userEntity, err := service.userRepository.GetByEmail(request.Email)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if err := checkPasswordHash(password, userEntity.PasswordHash); err != nil {
+	if err := checkPasswordHash(request.Password, userEntity.PasswordHash); err != nil {
 		return nil, err
 	}
 
 	user := dto.MapUserDTO(userEntity)
 	return &user, nil
+}
+
+func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*dto.UserDTO, error) {
+	passwordHash, err := hashPassword(request.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	userEntity := repositories.UserEntity{
+		FirstName:    request.FirstName,
+		LastName:     request.LastName,
+		Email:        request.Email,
+		PasswordHash: passwordHash,
+		IsAdmin:      false,
+	}
+
+	if err := service.userRepository.Create(&userEntity); err != nil {
+		return nil, err
+	}
+
+	response := dto.MapUserDTO(&userEntity)
+	return &response, nil
 }
 
 func hashPassword(password string) (string, error) {
