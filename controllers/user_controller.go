@@ -42,3 +42,7 @@ func (controller *UserController) Create(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
+
+func (controller *UserController) Edit(c *gin.Context) {
+	// TODO
+}

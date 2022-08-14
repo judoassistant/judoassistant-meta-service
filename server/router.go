@@ -10,9 +10,18 @@ func NewRouter(authMiddleware gin.HandlerFunc, adminAreaMiddleware gin.HandlerFu
 	router.Use(gin.Logger())
 	router.Use(authMiddleware)
 
+	router.GET("/users", adminAreaMiddleware, userController.Index)
+	router.POST("/users", adminAreaMiddleware, userController.Create)
+	router.PUT("/users", adminAreaMiddleware, userController.Index)
+	router.GET("/users/:id", adminAreaMiddleware, userController.Index)
+	router.PUT("/users/:id/update_password", adminAreaMiddleware, userController.Index)
+
 	router.GET("/tournaments", tournamentController.Index)
-	router.GET("/users/", adminAreaMiddleware, userController.Index)
-	router.POST("/users/register", adminAreaMiddleware, userController.Create)
+	router.GET("/tournaments/past", tournamentController.Index)
+	router.GET("/tournaments/upcoming", tournamentController.Index)
+	router.POST("/tournaments", tournamentController.Index)
+	router.PUT("/tournaments/:id", tournamentController.Index)
+	router.DELETE("/tournaments/:id", tournamentController.Index)
 
 	return router
 }
