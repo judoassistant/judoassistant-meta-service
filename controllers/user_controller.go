@@ -28,7 +28,7 @@ func (controller *UserController) Index(c *gin.Context) {
 }
 
 func (controller *UserController) Create(c *gin.Context) {
-	var request dto.UserRegistrationRequestDTO
+	request := dto.UserRegistrationRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -43,6 +43,14 @@ func (controller *UserController) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (controller *UserController) Edit(c *gin.Context) {
+func (controller *UserController) Update(c *gin.Context) {
+	// TODO
+}
+
+func (controller *UserController) Get(c *gin.Context) {
+	// TODO
+}
+
+func (controller *UserController) UpdatePassword(c *gin.Context) {
 	// TODO
 }

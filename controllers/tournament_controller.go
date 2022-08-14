@@ -5,8 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/judoassistant/judoassistant-meta-service/dto"
-	"github.com/judoassistant/judoassistant-meta-service/middleware"
 	"github.com/judoassistant/judoassistant-meta-service/services"
 )
 
@@ -18,12 +16,29 @@ func NewTournamentController(tournamentService *services.TournamentService) *Tou
 	return &TournamentController{tournamentService}
 }
 
-func (tc *TournamentController) Index(c *gin.Context) {
-	user := c.MustGet(middleware.AuthUserKey).(*dto.UserDTO)
-	log.Println(user.Email, user.ID, user.IsAdmin)
-	response := dto.TournamentResponseDTO{
-		Name:     "Hello",
-		Location: "Foo",
-	}
-	c.JSON(http.StatusOK, response)
+type IndexQueryParamsDTO struct {
+	After int `form:"after"`
 }
+
+func (tc *TournamentController) Index(c *gin.Context) {
+	queryParams := IndexQueryParamsDTO{}
+	if err := c.BindJSON(&queryParams); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	// user := c.MustGet(middleware.AuthUserKey).(*dto.UserDTO)
+	log.Println(queryParams.After)
+}
+
+func (tc *TournamentController) GetPast(c *gin.Context) {}
+
+func (tc *TournamentController) GetUpcoming(c *gin.Context) {}
+
+func (tc *TournamentController) Create(c *gin.Context) {}
+
+func (tc *TournamentController) Get(c *gin.Context) {}
+
+func (tc *TournamentController) Update(c *gin.Context) {}
+
+func (tc *TournamentController) Delete(c *gin.Context) {}
