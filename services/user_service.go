@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/judoassistant/judoassistant-meta-service/dto"
+	"github.com/judoassistant/judoassistant-meta-service/entities"
 	"github.com/judoassistant/judoassistant-meta-service/repositories"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -35,7 +36,7 @@ func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*
 		return nil, err
 	}
 
-	userEntity := repositories.UserEntity{
+	userEntity := entities.UserEntity{
 		FirstName:    request.FirstName,
 		LastName:     request.LastName,
 		Email:        request.Email,
