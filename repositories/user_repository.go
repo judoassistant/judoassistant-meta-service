@@ -16,7 +16,6 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 }
 
 func (repository *UserRepository) Create(entity *entities.UserEntity) error {
-	log.Println("Hello WOrld!")
 	return repository.db.Get(&entity.ID, "INSERT INTO users (first_name, last_name, email, password_hash, is_admin) VALUES ($1, $2, $3, $4, $5) RETURNING id", entity.FirstName, entity.LastName, entity.Email, entity.PasswordHash, entity.IsAdmin)
 }
 
