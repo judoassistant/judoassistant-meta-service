@@ -11,6 +11,7 @@ type TournamentResponseDTO struct {
 	Name     string    `json:"name"`
 	Location string    `json:"location"`
 	Date     time.Time `json:"date"`
+	Owner    int64     `json:"owner"`
 }
 
 func MapTournamentResponseDTO(tournament *entities.TournamentEntity) TournamentResponseDTO {
@@ -18,6 +19,7 @@ func MapTournamentResponseDTO(tournament *entities.TournamentEntity) TournamentR
 		Name:     tournament.Name,
 		Location: tournament.Location,
 		Date:     tournament.Date,
+		Owner:    tournament.Owner,
 	}
 }
 

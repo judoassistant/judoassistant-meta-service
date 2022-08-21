@@ -18,7 +18,7 @@ func NewTournamentService(tournamentRepository *repositories.TournamentRepositor
 
 func (service *TournamentService) GetPast(count int) ([]dto.TournamentResponseDTO, error) {
 	today := time.Now()
-	tournaments, err := service.tournamentRepository.GetByDateLessThan(today, 10) // TODO: find nice place to put constants
+	tournaments, err := service.tournamentRepository.GetByDateLessThanAndNotDeleted(today, 10) // TODO: find nice place to put constants
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func (service *TournamentService) GetPast(count int) ([]dto.TournamentResponseDT
 
 func (service *TournamentService) GetUpcoming(count int) ([]dto.TournamentResponseDTO, error) {
 	today := time.Now()
-	tournaments, err := service.tournamentRepository.GetByDateGreaterThanEqual(today, 10) // TODO: find nice place to put constants
+	tournaments, err := service.tournamentRepository.GetByDateGreaterThanEqualAndNotDeleted(today, 10) // TODO: find nice place to put constants
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +37,7 @@ func (service *TournamentService) GetUpcoming(count int) ([]dto.TournamentRespon
 }
 
 func (service *TournamentService) Get(after int64, count int) ([]dto.TournamentResponseDTO, error) {
-	tournamentEntities, err := service.tournamentRepository.GetByIdGreaterThan(after, count)
+	tournamentEntities, err := service.tournamentRepository.GetByIdGreaterThanAndNotDeleted(after, count)
 	if err != nil {
 		return nil, err
 	}
