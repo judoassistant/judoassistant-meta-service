@@ -20,12 +20,12 @@ func NewTournamentRepository(db *sqlx.DB) *TournamentRepository {
 }
 
 func (repository *TournamentRepository) Create(entity *entities.TournamentEntity) error {
-	return repository.db.Get(&entity.ID, "INSERT INTO tournaments (name, location, date) VALUES ($1, $2, $3) RETURNING id", entity.Name, entity.Location, entity.Date)
+	return repository.db.Get(&entity.ID, "INSERT INTO tournaments (name, location, date, is_deleted, owner) VALUES ($1, $2, $3, $4, $5) RETURNING id", entity.Name, entity.Location, entity.Date, entity.IsDeleted, entity.Owner)
 }
 
 func (repository *TournamentRepository) Update(entity *entities.TournamentEntity) error {
-	// TODO: Implement
-	return nil
+	_, err := repository.db.Exec("UPDATE tournaments SET name = $2, location = $3, date = $4, is_deleted = $5, owner = $6 WHERE id = $1", entity.ID, entity.Name, entity.Location, entity.Date, entity.IsDeleted, entity.Owner)
+	return err
 }
 
 func (repository *TournamentRepository) GetById(id int64) (*entities.TournamentEntity, error) {

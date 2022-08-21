@@ -74,9 +74,10 @@ func (service *TournamentService) Update(id int64, request *dto.TournamentUpdate
 
 func (service *TournamentService) Create(tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error) {
 	entity := entities.TournamentEntity{
-		Name:     tournament.Name,
-		Location: tournament.Location,
-		Date:     tournament.Date,
+		Name:      tournament.Name,
+		Location:  tournament.Location,
+		Date:      tournament.Date,
+		IsDeleted: false,
 	}
 
 	if err := service.tournamentRepository.Create(&entity); err != nil {
