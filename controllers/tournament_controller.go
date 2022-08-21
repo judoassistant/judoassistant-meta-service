@@ -17,8 +17,8 @@ func NewTournamentController(tournamentService *services.TournamentService) *Tou
 }
 
 func (tc *TournamentController) Index(c *gin.Context) {
-	queryParams := dto.IndexQueryParamsDTO{}
-	if err := c.BindQuery(&queryParams); err != nil {
+	queryParams := dto.TournamentIndexQueryDTO{}
+	if err := c.ShouldBindQuery(&queryParams); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
