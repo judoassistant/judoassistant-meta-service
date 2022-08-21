@@ -9,7 +9,7 @@ import (
 
 func AdminAreaMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user := c.MustGet(AuthUserKey).(*dto.UserDTO)
+		user := c.MustGet(AuthUserKey).(*dto.UserResponseDTO)
 
 		if !user.IsAdmin {
 			c.AbortWithStatus(http.StatusForbidden)

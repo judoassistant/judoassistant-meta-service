@@ -51,7 +51,7 @@ func (controller *UserController) Get(c *gin.Context) {
 		return
 	}
 
-	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserDTO)
+	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 
 	if query.ID != authorizedUser.ID {
 		c.AbortWithStatus(http.StatusForbidden)
@@ -73,7 +73,7 @@ func (controller *UserController) UpdatePassword(c *gin.Context) {
 		return
 	}
 
-	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserDTO)
+	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 
 	if request.ID != authorizedUser.ID {
 		c.AbortWithStatus(http.StatusForbidden)

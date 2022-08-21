@@ -26,7 +26,7 @@ func (service *UserService) Authenticate(request *dto.UserAuthenticationRequestD
 		return nil, err
 	}
 
-	user := dto.MapUserDTO(userEntity)
+	user := dto.MapUserResponseDTO(userEntity)
 	return &user, nil
 }
 
@@ -48,7 +48,7 @@ func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*
 		return nil, err
 	}
 
-	response := dto.MapUserDTO(&userEntity)
+	response := dto.MapUserResponseDTO(&userEntity)
 	return &response, nil
 }
 
@@ -70,7 +70,7 @@ func (service *UserService) UpdatePassword(request *dto.UserPasswordUpdateReques
 		return nil, err
 	}
 
-	response := dto.MapUserDTO(userEntity)
+	response := dto.MapUserResponseDTO(userEntity)
 	return &response, nil
 }
 
@@ -84,7 +84,7 @@ func (service *UserService) GetById(id int64) (*dto.UserResponseDTO, error) {
 		return nil, err
 	}
 
-	response := dto.MapUserDTO(userEntity)
+	response := dto.MapUserResponseDTO(userEntity)
 	return &response, nil
 }
 
@@ -95,7 +95,7 @@ func (service *UserService) GetAll() ([]dto.UserResponseDTO, error) {
 		return nil, err
 	}
 
-	return dto.MapUserDTOs(users), nil
+	return dto.MapUserResponseDTOs(users), nil
 }
 
 func hashPassword(password string) (string, error) {
