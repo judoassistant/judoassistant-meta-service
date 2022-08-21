@@ -44,11 +44,6 @@ func (controller *UserController) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (controller *UserController) Update(c *gin.Context) {
-	// TODO: Implement
-	c.AbortWithStatus(http.StatusNotImplemented)
-}
-
 func (controller *UserController) Get(c *gin.Context) {
 	query := dto.UserGetQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
@@ -92,4 +87,9 @@ func (controller *UserController) UpdatePassword(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func (controller *UserController) Update(c *gin.Context) {
+	// TODO: Implement
+	c.AbortWithStatus(http.StatusNotImplemented)
 }
