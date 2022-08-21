@@ -25,6 +25,10 @@ func (ts *TournamentService) Get(after int64, count int) ([]dto.TournamentIndexR
 	return nil, nil
 }
 
+func (ts *TournamentService) GetById(after int64) ([]dto.TournamentIndexResponseDTO, error) {
+	return nil, nil
+}
+
 func (ts *TournamentService) Create(tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentCreationResponseDTO, error) {
 	return nil, nil
 }
