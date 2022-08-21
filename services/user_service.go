@@ -52,17 +52,29 @@ func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*
 	return &response, nil
 }
 
-func (service *UserService) Update(request *dto.UserUpdateRequestDTO) (*dto.UserResponseDTO, error) {
-	return nil, nil // TODO: Implement
-}
-
-func (service *UserService) UpdatePassword(request *dto.UserPasswordUpdateRequestDTO) (*dto.UserResponseDTO, error) {
-	userEntity, err := service.userRepository.GetById(request.ID)
+func (service *UserService) Update(id int64, request *dto.UserUpdateRequestDTO) (*dto.UserResponseDTO, error) {
+	userEntity, err := service.userRepository.GetById(id)
 	if err != nil {
 		return nil, err
 	}
 
-	if userEntity.PasswordHash, err = hashPassword(request.Password); err != nil {
+	dto.MapToUserEntity(request, userEntity)
+
+	if err := service.userRepository.Update(userEntity); err != nil {
+		return nil, err
+	}
+
+	response := dto.MapUserResponseDTO(userEntity)
+	return &response, nil
+}
+
+func (service *UserService) UpdatePassword(id int64, password string) (*dto.UserResponseDTO, error) {
+	userEntity, err := service.userRepository.GetById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if userEntity.PasswordHash, err = hashPassword(password); err != nil {
 		return nil, err
 	}
 

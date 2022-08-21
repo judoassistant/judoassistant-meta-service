@@ -1,5 +1,5 @@
 package dto
 
-type UserGetQueryDTO struct {
+type TournamentQueryDTO struct {
 	ID int64 `form:"id"`
 }

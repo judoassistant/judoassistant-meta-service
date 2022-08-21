@@ -45,7 +45,7 @@ func (controller *UserController) Create(c *gin.Context) {
 }
 
 func (controller *UserController) Get(c *gin.Context) {
-	query := dto.UserGetQueryDTO{}
+	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -67,20 +67,26 @@ func (controller *UserController) Get(c *gin.Context) {
 }
 
 func (controller *UserController) UpdatePassword(c *gin.Context) {
+	query := dto.UserQueryDTO{}
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
 	request := dto.UserPasswordUpdateRequestDTO{}
-	if err := c.ShouldBind(&request); err != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 
-	if request.ID != authorizedUser.ID {
+	if query.ID != authorizedUser.ID {
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
-	user, err := controller.userService.UpdatePassword(&request)
+	user, err := controller.userService.UpdatePassword(query.ID, request.Password)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -90,6 +96,29 @@ func (controller *UserController) UpdatePassword(c *gin.Context) {
 }
 
 func (controller *UserController) Update(c *gin.Context) {
-	// TODO: Implement
-	c.AbortWithStatus(http.StatusNotImplemented)
+	query := dto.UserQueryDTO{}
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	request := dto.UserUpdateRequestDTO{}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
+	if query.ID != authorizedUser.ID {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+
+	user, err := controller.userService.Update(query.ID, &request)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, user)
 }

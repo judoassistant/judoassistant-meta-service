@@ -23,6 +23,11 @@ func (repository *TournamentRepository) Create(entity *entities.TournamentEntity
 	return repository.db.Get(&entity.ID, "INSERT INTO tournaments (name, location, date) VALUES ($1, $2, $3) RETURNING id", entity.Name, entity.Location, entity.Date)
 }
 
+func (repository *TournamentRepository) Update(entity *entities.TournamentEntity) error {
+	// TODO: Implement
+	return nil
+}
+
 func (repository *TournamentRepository) GetById(id int64) (*entities.TournamentEntity, error) {
 	tournament := entities.TournamentEntity{}
 	err := repository.db.Get(&tournament, "SELECT * FROM tournaments WHERE id = $1 LIMIT 1", id)

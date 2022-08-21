@@ -69,7 +69,7 @@ func (controller *TournamentController) Create(c *gin.Context) {
 }
 
 func (controller *TournamentController) Get(c *gin.Context) {
-	query := dto.TournamentGetQueryDTO{}
+	query := dto.TournamentQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -85,7 +85,26 @@ func (controller *TournamentController) Get(c *gin.Context) {
 }
 
 func (controller *TournamentController) Update(c *gin.Context) {
-	c.AbortWithStatus(http.StatusNotImplemented) // TODO: Implement
+	query := dto.TournamentQueryDTO{}
+	if err := c.ShouldBindQuery(&query); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	request := dto.TournamentUpdateRequestDTO{}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	// Todo: Verify ownership
+	tournament, err := controller.tournamentService.Update(query.ID, &request)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(http.StatusOK, tournament)
 }
 
 func (controller *TournamentController) Delete(c *gin.Context) {

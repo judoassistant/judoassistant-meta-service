@@ -56,6 +56,22 @@ func (service *TournamentService) GetById(id int64) (*dto.TournamentResponseDTO,
 	return &tournamentDTO, nil
 }
 
+func (service *TournamentService) Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error) {
+	entity, err := service.tournamentRepository.GetById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	dto.MapToTournamentEntity(request, entity)
+
+	if err := service.tournamentRepository.Update(entity); err != nil {
+		return nil, err
+	}
+
+	response := dto.MapTournamentResponseDTO(entity)
+	return &response, nil
+}
+
 func (service *TournamentService) Create(tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error) {
 	entity := entities.TournamentEntity{
 		Name:     tournament.Name,
