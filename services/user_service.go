@@ -15,7 +15,7 @@ func NewUserService(userRepository *repositories.UserRepository) *UserService {
 	return &UserService{userRepository}
 }
 
-func (service *UserService) Authenticate(request *dto.UserAuthenticationRequestDTO) (*dto.UserDTO, error) {
+func (service *UserService) Authenticate(request *dto.UserAuthenticationRequestDTO) (*dto.UserResponseDTO, error) {
 	userEntity, err := service.userRepository.GetByEmail(request.Email)
 
 	if err != nil {
@@ -30,7 +30,7 @@ func (service *UserService) Authenticate(request *dto.UserAuthenticationRequestD
 	return &user, nil
 }
 
-func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*dto.UserDTO, error) {
+func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*dto.UserResponseDTO, error) {
 	passwordHash, err := hashPassword(request.Password)
 	if err != nil {
 		return nil, err
@@ -52,11 +52,11 @@ func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*
 	return &response, nil
 }
 
-func (service *UserService) Update(request *dto.UserUpdateRequestDTO) (*dto.UserDTO, error) {
+func (service *UserService) Update(request *dto.UserUpdateRequestDTO) (*dto.UserResponseDTO, error) {
 	return nil, nil // TODO: Implement
 }
 
-func (service *UserService) UpdatePassword(request *dto.UserPasswordUpdateRequestDTO) (*dto.UserDTO, error) {
+func (service *UserService) UpdatePassword(request *dto.UserPasswordUpdateRequestDTO) (*dto.UserResponseDTO, error) {
 	userEntity, err := service.userRepository.GetById(request.ID)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func (service *UserService) ExistsByEmail(email string) (bool, error) {
 	return service.userRepository.ExistsByEmail(email)
 }
 
-func (service *UserService) GetById(id int64) (*dto.UserDTO, error) {
+func (service *UserService) GetById(id int64) (*dto.UserResponseDTO, error) {
 	userEntity, err := service.userRepository.GetById(id)
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (service *UserService) GetById(id int64) (*dto.UserDTO, error) {
 	return &response, nil
 }
 
-func (service *UserService) GetAll() ([]dto.UserDTO, error) {
+func (service *UserService) GetAll() ([]dto.UserResponseDTO, error) {
 	users, err := service.userRepository.GetAll()
 
 	if err != nil {

@@ -8,7 +8,7 @@ type UserResponseDTO struct {
 	IsAdmin bool   `json:"is_admin"`
 }
 
-func MapUserDTO(user *entities.UserEntity) UserResponseDTO {
+func MapUserResponseDTO(user *entities.UserEntity) UserResponseDTO {
 	return UserResponseDTO{
 		ID:      user.ID,
 		Email:   user.Email,
@@ -16,11 +16,11 @@ func MapUserDTO(user *entities.UserEntity) UserResponseDTO {
 	}
 }
 
-func MapUserDTOs(users []entities.UserEntity) []UserResponseDTO {
+func MapUserResponseDTOs(users []entities.UserEntity) []UserResponseDTO {
 	result := make([]UserResponseDTO, len(users))
 
 	for key, value := range users {
-		result[key] = MapUserDTO(&value)
+		result[key] = MapUserResponseDTO(&value)
 	}
 
 	return result
