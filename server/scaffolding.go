@@ -8,14 +8,14 @@ import (
 )
 
 func InitScaffoldingData(userService *services.UserService, tournamentService *services.TournamentService) error {
-	user := dto.UserRegistrationRequestDTO{
+	userRequest := dto.UserRegistrationRequestDTO{
 		Email:     "svendcs@svendcs.com",
 		Password:  "password",
 		FirstName: "Svend Christian",
 		LastName:  "Svendsen",
 	}
 
-	exists, err := userService.ExistsByEmail(user.Email)
+	exists, err := userService.ExistsByEmail(userRequest.Email)
 	if err != nil {
 		return err
 	}
@@ -24,13 +24,14 @@ func InitScaffoldingData(userService *services.UserService, tournamentService *s
 		return nil
 	}
 
-	if _, err := userService.Register(&user); err != nil {
+	user, err := userService.Register(&userRequest)
+	if err != nil {
 		return err
 	}
 
 	tournament := dto.TournamentCreationRequestDTO{Name: "Bjergkøbing Grand Prix", Location: "Bjergkøbing", Date: time.Now()}
 
-	if _, err := tournamentService.Create(&tournament); err != nil {
+	if _, err := tournamentService.Create(user, &tournament); err != nil {
 		return err
 	}
 

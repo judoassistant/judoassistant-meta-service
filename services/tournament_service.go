@@ -72,11 +72,12 @@ func (service *TournamentService) Update(id int64, request *dto.TournamentUpdate
 	return &response, nil
 }
 
-func (service *TournamentService) Create(tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error) {
+func (service *TournamentService) Create(user *dto.UserResponseDTO, tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error) {
 	entity := entities.TournamentEntity{
 		Name:      tournament.Name,
 		Location:  tournament.Location,
 		Date:      tournament.Date,
+		Owner:     user.ID,
 		IsDeleted: false,
 	}
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/judoassistant/judoassistant-meta-service/dto"
+	"github.com/judoassistant/judoassistant-meta-service/middleware"
 	"github.com/judoassistant/judoassistant-meta-service/services"
 )
 
@@ -59,7 +60,9 @@ func (controller *TournamentController) Create(c *gin.Context) {
 		return
 	}
 
-	response, err := controller.tournamentService.Create(&request)
+	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
+
+	response, err := controller.tournamentService.Create(user, &request)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
