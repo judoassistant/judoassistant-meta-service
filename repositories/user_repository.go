@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-
 	"github.com/jmoiron/sqlx"
 	"github.com/judoassistant/judoassistant-meta-service/entities"
 )
