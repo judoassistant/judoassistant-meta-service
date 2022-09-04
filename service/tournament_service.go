@@ -56,6 +56,16 @@ func (service *TournamentService) GetById(id int64) (*dto.TournamentResponseDTO,
 	return &tournamentDTO, nil
 }
 
+func (service *TournamentService) GetByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error) {
+	entities, err := service.tournamentRepository.GetByOwner(ownerID)
+	if err != nil {
+		return nil, err
+	}
+
+	tournamentDTOs := dto.MapTournamentResponseDTOs(entities)
+	return tournamentDTOs, err
+}
+
 func (service *TournamentService) Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error) {
 	entity, err := service.tournamentRepository.GetById(id)
 	if err != nil {

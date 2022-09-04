@@ -34,6 +34,12 @@ func (repository *TournamentRepository) GetById(id int64) (*entity.TournamentEnt
 	return &tournament, err
 }
 
+func (repository *TournamentRepository) GetByOwner(ownerID int64) ([]entity.TournamentEntity, error) {
+	tournaments := []entity.TournamentEntity{}
+	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE owner = $1", ownerID)
+	return tournaments, err
+}
+
 func (repository *TournamentRepository) GetByIdGreaterThanAndNotDeleted(after int64, count int) ([]entity.TournamentEntity, error) {
 	tournaments := []entity.TournamentEntity{}
 	err := repository.db.Get(&tournaments, "SELECT * FROM tournaments WHERE id >= $1 AND is_deleted = 0 LIMIT $2 ORDER BY id", after, count)
