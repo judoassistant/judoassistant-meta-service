@@ -18,8 +18,8 @@ func (repository *UserRepository) Create(entity *entity.UserEntity) error {
 }
 
 func (repository *UserRepository) Update(entity *entity.UserEntity) error {
-	// TODO: Implement
-	return nil
+	_, err := repository.db.Exec("UPDATE users SET first_name = $2, last_name = $3, email = $4, password_hash = $5, is_admin = $6 WHERE id = $1", entity.ID, entity.FirstName, entity.LastName, entity.Email, entity.PasswordHash, entity.IsAdmin)
+	return err
 }
 
 func (repository *UserRepository) ExistsByEmail(email string) (bool, error) {
