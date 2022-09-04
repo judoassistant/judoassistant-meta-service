@@ -7,16 +7,26 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserService struct {
+type UserService interface {
+	Authenticate(request *dto.UserAuthenticationRequestDTO) (*dto.UserResponseDTO, error)
+	Register(request *dto.UserRegistrationRequestDTO) (*dto.UserResponseDTO, error)
+	Update(id int64, request *dto.UserUpdateRequestDTO) (*dto.UserResponseDTO, error)
+	UpdatePassword(id int64, password string) (*dto.UserResponseDTO, error)
+	ExistsByEmail(email string) (bool, error)
+	GetById(id int64) (*dto.UserResponseDTO, error)
+	GetAll() ([]dto.UserResponseDTO, error)
+}
+
+type userService struct {
 	userRepository *repository.UserRepository
 }
 
-func NewUserService(userRepository *repository.UserRepository) *UserService {
-	return &UserService{userRepository}
+func NewUserService(userRepository *repository.UserRepository) UserService {
+	return &userService{userRepository}
 }
 
-func (service *UserService) Authenticate(request *dto.UserAuthenticationRequestDTO) (*dto.UserResponseDTO, error) {
-	userEntity, err := service.userRepository.GetByEmail(request.Email)
+func (s *userService) Authenticate(request *dto.UserAuthenticationRequestDTO) (*dto.UserResponseDTO, error) {
+	userEntity, err := s.userRepository.GetByEmail(request.Email)
 
 	if err != nil {
 		return nil, err
@@ -30,7 +40,7 @@ func (service *UserService) Authenticate(request *dto.UserAuthenticationRequestD
 	return &user, nil
 }
 
-func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*dto.UserResponseDTO, error) {
+func (s *userService) Register(request *dto.UserRegistrationRequestDTO) (*dto.UserResponseDTO, error) {
 	passwordHash, err := hashPassword(request.Password)
 	if err != nil {
 		return nil, err
@@ -44,7 +54,7 @@ func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*
 		IsAdmin:      false,
 	}
 
-	if err := service.userRepository.Create(&userEntity); err != nil {
+	if err := s.userRepository.Create(&userEntity); err != nil {
 		return nil, err
 	}
 
@@ -52,15 +62,15 @@ func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*
 	return &response, nil
 }
 
-func (service *UserService) Update(id int64, request *dto.UserUpdateRequestDTO) (*dto.UserResponseDTO, error) {
-	userEntity, err := service.userRepository.GetById(id)
+func (s *userService) Update(id int64, request *dto.UserUpdateRequestDTO) (*dto.UserResponseDTO, error) {
+	userEntity, err := s.userRepository.GetById(id)
 	if err != nil {
 		return nil, err
 	}
 
 	dto.MapToUserEntity(request, userEntity)
 
-	if err := service.userRepository.Update(userEntity); err != nil {
+	if err := s.userRepository.Update(userEntity); err != nil {
 		return nil, err
 	}
 
@@ -68,8 +78,8 @@ func (service *UserService) Update(id int64, request *dto.UserUpdateRequestDTO) 
 	return &response, nil
 }
 
-func (service *UserService) UpdatePassword(id int64, password string) (*dto.UserResponseDTO, error) {
-	userEntity, err := service.userRepository.GetById(id)
+func (s *userService) UpdatePassword(id int64, password string) (*dto.UserResponseDTO, error) {
+	userEntity, err := s.userRepository.GetById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +88,7 @@ func (service *UserService) UpdatePassword(id int64, password string) (*dto.User
 		return nil, err
 	}
 
-	if err := service.userRepository.Update(userEntity); err != nil {
+	if err := s.userRepository.Update(userEntity); err != nil {
 		return nil, err
 	}
 
@@ -86,12 +96,12 @@ func (service *UserService) UpdatePassword(id int64, password string) (*dto.User
 	return &response, nil
 }
 
-func (service *UserService) ExistsByEmail(email string) (bool, error) {
-	return service.userRepository.ExistsByEmail(email)
+func (s *userService) ExistsByEmail(email string) (bool, error) {
+	return s.userRepository.ExistsByEmail(email)
 }
 
-func (service *UserService) GetById(id int64) (*dto.UserResponseDTO, error) {
-	userEntity, err := service.userRepository.GetById(id)
+func (s *userService) GetById(id int64) (*dto.UserResponseDTO, error) {
+	userEntity, err := s.userRepository.GetById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -100,8 +110,8 @@ func (service *UserService) GetById(id int64) (*dto.UserResponseDTO, error) {
 	return &response, nil
 }
 
-func (service *UserService) GetAll() ([]dto.UserResponseDTO, error) {
-	users, err := service.userRepository.GetAll()
+func (s *userService) GetAll() ([]dto.UserResponseDTO, error) {
+	users, err := s.userRepository.GetAll()
 
 	if err != nil {
 		return nil, err

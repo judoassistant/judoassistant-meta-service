@@ -8,17 +8,27 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/repository"
 )
 
-type TournamentService struct {
+type TournamentService interface {
+	GetPast(count int) ([]dto.TournamentResponseDTO, error)
+	GetUpcoming(count int) ([]dto.TournamentResponseDTO, error)
+	Get(after int64, count int) ([]dto.TournamentResponseDTO, error)
+	GetById(id int64) (*dto.TournamentResponseDTO, error)
+	GetByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error)
+	Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error)
+	Create(user *dto.UserResponseDTO, tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error)
+}
+
+type tournamentService struct {
 	tournamentRepository *repository.TournamentRepository
 }
 
-func NewTournamentService(tournamentRepository *repository.TournamentRepository) *TournamentService {
-	return &TournamentService{tournamentRepository}
+func NewTournamentService(tournamentRepository *repository.TournamentRepository) TournamentService {
+	return &tournamentService{tournamentRepository}
 }
 
-func (service *TournamentService) GetPast(count int) ([]dto.TournamentResponseDTO, error) {
+func (s *tournamentService) GetPast(count int) ([]dto.TournamentResponseDTO, error) {
 	today := time.Now()
-	tournaments, err := service.tournamentRepository.GetByDateLessThanAndNotDeleted(today, 10) // TODO: find nice place to put constants
+	tournaments, err := s.tournamentRepository.GetByDateLessThanAndNotDeleted(today, 10) // TODO: find nice place to put constants
 	if err != nil {
 		return nil, err
 	}
@@ -26,9 +36,9 @@ func (service *TournamentService) GetPast(count int) ([]dto.TournamentResponseDT
 	return dto.MapTournamentResponseDTOs(tournaments), nil
 }
 
-func (service *TournamentService) GetUpcoming(count int) ([]dto.TournamentResponseDTO, error) {
+func (s *tournamentService) GetUpcoming(count int) ([]dto.TournamentResponseDTO, error) {
 	today := time.Now()
-	tournaments, err := service.tournamentRepository.GetByDateGreaterThanEqualAndNotDeleted(today, 10) // TODO: find nice place to put constants
+	tournaments, err := s.tournamentRepository.GetByDateGreaterThanEqualAndNotDeleted(today, 10) // TODO: find nice place to put constants
 	if err != nil {
 		return nil, err
 	}
@@ -36,8 +46,8 @@ func (service *TournamentService) GetUpcoming(count int) ([]dto.TournamentRespon
 	return dto.MapTournamentResponseDTOs(tournaments), nil
 }
 
-func (service *TournamentService) Get(after int64, count int) ([]dto.TournamentResponseDTO, error) {
-	tournamentEntities, err := service.tournamentRepository.GetByIdGreaterThanAndNotDeleted(after, count)
+func (s *tournamentService) Get(after int64, count int) ([]dto.TournamentResponseDTO, error) {
+	tournamentEntities, err := s.tournamentRepository.GetByIdGreaterThanAndNotDeleted(after, count)
 	if err != nil {
 		return nil, err
 	}
@@ -46,8 +56,8 @@ func (service *TournamentService) Get(after int64, count int) ([]dto.TournamentR
 	return tournamentDTOs, nil
 }
 
-func (service *TournamentService) GetById(id int64) (*dto.TournamentResponseDTO, error) {
-	tournamentEntity, err := service.tournamentRepository.GetById(id)
+func (s *tournamentService) GetById(id int64) (*dto.TournamentResponseDTO, error) {
+	tournamentEntity, err := s.tournamentRepository.GetById(id)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +66,8 @@ func (service *TournamentService) GetById(id int64) (*dto.TournamentResponseDTO,
 	return &tournamentDTO, nil
 }
 
-func (service *TournamentService) GetByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error) {
-	entities, err := service.tournamentRepository.GetByOwner(ownerID)
+func (s *tournamentService) GetByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error) {
+	entities, err := s.tournamentRepository.GetByOwner(ownerID)
 	if err != nil {
 		return nil, err
 	}
@@ -66,15 +76,15 @@ func (service *TournamentService) GetByOwner(ownerID int64) ([]dto.TournamentRes
 	return tournamentDTOs, err
 }
 
-func (service *TournamentService) Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error) {
-	entity, err := service.tournamentRepository.GetById(id)
+func (s *tournamentService) Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error) {
+	entity, err := s.tournamentRepository.GetById(id)
 	if err != nil {
 		return nil, err
 	}
 
 	dto.MapToTournamentEntity(request, entity)
 
-	if err := service.tournamentRepository.Update(entity); err != nil {
+	if err := s.tournamentRepository.Update(entity); err != nil {
 		return nil, err
 	}
 
@@ -82,7 +92,7 @@ func (service *TournamentService) Update(id int64, request *dto.TournamentUpdate
 	return &response, nil
 }
 
-func (service *TournamentService) Create(user *dto.UserResponseDTO, tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error) {
+func (s *tournamentService) Create(user *dto.UserResponseDTO, tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error) {
 	entity := entity.TournamentEntity{
 		Name:      tournament.Name,
 		Location:  tournament.Location,
@@ -91,7 +101,7 @@ func (service *TournamentService) Create(user *dto.UserResponseDTO, tournament *
 		IsDeleted: false,
 	}
 
-	if err := service.tournamentRepository.Create(&entity); err != nil {
+	if err := s.tournamentRepository.Create(&entity); err != nil {
 		return nil, err
 	}
 

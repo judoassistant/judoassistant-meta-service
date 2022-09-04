@@ -10,7 +10,7 @@ import (
 
 const AuthUserKey = "user"
 
-func BasicAuthMiddleware(userService *service.UserService) gin.HandlerFunc {
+func BasicAuthMiddleware(userService service.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		email, password, hasAuth := c.Request.BasicAuth()
 

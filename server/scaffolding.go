@@ -7,7 +7,7 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/service"
 )
 
-func InitScaffoldingData(userService *service.UserService, tournamentService *service.TournamentService) error {
+func InitScaffoldingData(userService service.UserService, tournamentService service.TournamentService) error {
 	userRequest := dto.UserRegistrationRequestDTO{
 		Email:     "svendcs@svendcs.com",
 		Password:  "password",
