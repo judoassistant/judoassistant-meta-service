@@ -9,15 +9,15 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/service"
 )
 
-type UserController struct {
+type UserHandler struct {
 	userService *service.UserService
 }
 
-func NewUserController(userService *service.UserService) *UserController {
-	return &UserController{userService}
+func NewUserHandler(userService *service.UserService) *UserHandler {
+	return &UserHandler{userService}
 }
 
-func (controller *UserController) Index(c *gin.Context) {
+func (controller *UserHandler) Index(c *gin.Context) {
 	users, err := controller.userService.GetAll()
 
 	if err != nil {
@@ -28,7 +28,7 @@ func (controller *UserController) Index(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
 }
 
-func (controller *UserController) Create(c *gin.Context) {
+func (controller *UserHandler) Create(c *gin.Context) {
 	request := dto.UserRegistrationRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -44,7 +44,7 @@ func (controller *UserController) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (controller *UserController) Get(c *gin.Context) {
+func (controller *UserHandler) Get(c *gin.Context) {
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -66,7 +66,7 @@ func (controller *UserController) Get(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (controller *UserController) UpdatePassword(c *gin.Context) {
+func (controller *UserHandler) UpdatePassword(c *gin.Context) {
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -95,7 +95,7 @@ func (controller *UserController) UpdatePassword(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-func (controller *UserController) Update(c *gin.Context) {
+func (controller *UserHandler) Update(c *gin.Context) {
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)

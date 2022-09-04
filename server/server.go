@@ -22,11 +22,11 @@ func Init() {
 
 	tournamentRepository := repository.NewTournamentRepository(database)
 	tournamentService := service.NewTournamentService(tournamentRepository)
-	tournamentController := handler.NewTournamentController(tournamentService)
+	tournamentHandler := handler.NewTournamentHandler(tournamentService)
 
 	userRepository := repository.NewUserRepository(database)
 	userService := service.NewUserService(userRepository)
-	userController := handler.NewUserController(userService)
+	userHandler := handler.NewUserHandler(userService)
 
 	if err := InitScaffoldingData(userService, tournamentService); err != nil {
 		log.Fatalln(err)
@@ -34,7 +34,7 @@ func Init() {
 
 	authMiddleware := middleware.BasicAuthMiddleware(userService)
 	adminAreaMiddleware := middleware.AdminAreaMiddleware()
-	router := NewRouter(authMiddleware, adminAreaMiddleware, tournamentController, userController)
+	router := NewRouter(authMiddleware, adminAreaMiddleware, tournamentHandler, userHandler)
 
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 	router.Run(":8080")
