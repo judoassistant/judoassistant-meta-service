@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"github.com/judoassistant/judoassistant-meta-service/entities"
+	"github.com/judoassistant/judoassistant-meta-service/entity"
 )
 
 type TournamentResponseDTO struct {
@@ -14,7 +14,7 @@ type TournamentResponseDTO struct {
 	Owner    int64     `json:"owner"`
 }
 
-func MapTournamentResponseDTO(tournament *entities.TournamentEntity) TournamentResponseDTO {
+func MapTournamentResponseDTO(tournament *entity.TournamentEntity) TournamentResponseDTO {
 	return TournamentResponseDTO{
 		Name:     tournament.Name,
 		Location: tournament.Location,
@@ -23,7 +23,7 @@ func MapTournamentResponseDTO(tournament *entities.TournamentEntity) TournamentR
 	}
 }
 
-func MapTournamentResponseDTOs(tournaments []entities.TournamentEntity) []TournamentResponseDTO {
+func MapTournamentResponseDTOs(tournaments []entity.TournamentEntity) []TournamentResponseDTO {
 	result := make([]TournamentResponseDTO, len(tournaments))
 	for key, value := range tournaments {
 		result[key] = MapTournamentResponseDTO(&value)

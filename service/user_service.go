@@ -1,17 +1,17 @@
-package services
+package service
 
 import (
 	"github.com/judoassistant/judoassistant-meta-service/dto"
-	"github.com/judoassistant/judoassistant-meta-service/entities"
-	"github.com/judoassistant/judoassistant-meta-service/repositories"
+	"github.com/judoassistant/judoassistant-meta-service/entity"
+	"github.com/judoassistant/judoassistant-meta-service/repository"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
-	userRepository *repositories.UserRepository
+	userRepository *repository.UserRepository
 }
 
-func NewUserService(userRepository *repositories.UserRepository) *UserService {
+func NewUserService(userRepository *repository.UserRepository) *UserService {
 	return &UserService{userRepository}
 }
 
@@ -36,7 +36,7 @@ func (service *UserService) Register(request *dto.UserRegistrationRequestDTO) (*
 		return nil, err
 	}
 
-	userEntity := entities.UserEntity{
+	userEntity := entity.UserEntity{
 		FirstName:    request.FirstName,
 		LastName:     request.LastName,
 		Email:        request.Email,

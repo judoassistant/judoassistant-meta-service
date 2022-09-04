@@ -1,4 +1,4 @@
-package controllers
+package handler
 
 import (
 	"net/http"
@@ -6,14 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/middleware"
-	"github.com/judoassistant/judoassistant-meta-service/services"
+	"github.com/judoassistant/judoassistant-meta-service/service"
 )
 
 type UserController struct {
-	userService *services.UserService
+	userService *service.UserService
 }
 
-func NewUserController(userService *services.UserService) *UserController {
+func NewUserController(userService *service.UserService) *UserController {
 	return &UserController{userService}
 }
 

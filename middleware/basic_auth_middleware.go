@@ -5,12 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/judoassistant/judoassistant-meta-service/dto"
-	"github.com/judoassistant/judoassistant-meta-service/services"
+	"github.com/judoassistant/judoassistant-meta-service/service"
 )
 
 const AuthUserKey = "user"
 
-func BasicAuthMiddleware(userService *services.UserService) gin.HandlerFunc {
+func BasicAuthMiddleware(userService *service.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		email, password, hasAuth := c.Request.BasicAuth()
 

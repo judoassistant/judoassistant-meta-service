@@ -4,10 +4,10 @@ import (
 	"time"
 
 	"github.com/judoassistant/judoassistant-meta-service/dto"
-	"github.com/judoassistant/judoassistant-meta-service/services"
+	"github.com/judoassistant/judoassistant-meta-service/service"
 )
 
-func InitScaffoldingData(userService *services.UserService, tournamentService *services.TournamentService) error {
+func InitScaffoldingData(userService *service.UserService, tournamentService *service.TournamentService) error {
 	userRequest := dto.UserRegistrationRequestDTO{
 		Email:     "svendcs@svendcs.com",
 		Password:  "password",

@@ -2,10 +2,10 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/judoassistant/judoassistant-meta-service/controllers"
+	"github.com/judoassistant/judoassistant-meta-service/handler"
 )
 
-func NewRouter(authMiddleware gin.HandlerFunc, adminAreaMiddleware gin.HandlerFunc, tournamentController *controllers.TournamentController, userController *controllers.UserController) *gin.Engine {
+func NewRouter(authMiddleware gin.HandlerFunc, adminAreaMiddleware gin.HandlerFunc, tournamentController *handler.TournamentController, userController *handler.UserController) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(authMiddleware)

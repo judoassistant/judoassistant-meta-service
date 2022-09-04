@@ -1,18 +1,18 @@
-package services
+package service
 
 import (
 	"time"
 
 	"github.com/judoassistant/judoassistant-meta-service/dto"
-	"github.com/judoassistant/judoassistant-meta-service/entities"
-	"github.com/judoassistant/judoassistant-meta-service/repositories"
+	"github.com/judoassistant/judoassistant-meta-service/entity"
+	"github.com/judoassistant/judoassistant-meta-service/repository"
 )
 
 type TournamentService struct {
-	tournamentRepository *repositories.TournamentRepository
+	tournamentRepository *repository.TournamentRepository
 }
 
-func NewTournamentService(tournamentRepository *repositories.TournamentRepository) *TournamentService {
+func NewTournamentService(tournamentRepository *repository.TournamentRepository) *TournamentService {
 	return &TournamentService{tournamentRepository}
 }
 
@@ -73,7 +73,7 @@ func (service *TournamentService) Update(id int64, request *dto.TournamentUpdate
 }
 
 func (service *TournamentService) Create(user *dto.UserResponseDTO, tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error) {
-	entity := entities.TournamentEntity{
+	entity := entity.TournamentEntity{
 		Name:      tournament.Name,
 		Location:  tournament.Location,
 		Date:      tournament.Date,

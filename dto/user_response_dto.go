@@ -1,6 +1,6 @@
 package dto
 
-import "github.com/judoassistant/judoassistant-meta-service/entities"
+import "github.com/judoassistant/judoassistant-meta-service/entity"
 
 type UserResponseDTO struct {
 	ID      int64  `json:"id"`
@@ -8,7 +8,7 @@ type UserResponseDTO struct {
 	IsAdmin bool   `json:"is_admin"`
 }
 
-func MapUserResponseDTO(user *entities.UserEntity) UserResponseDTO {
+func MapUserResponseDTO(user *entity.UserEntity) UserResponseDTO {
 	return UserResponseDTO{
 		ID:      user.ID,
 		Email:   user.Email,
@@ -16,7 +16,7 @@ func MapUserResponseDTO(user *entities.UserEntity) UserResponseDTO {
 	}
 }
 
-func MapUserResponseDTOs(users []entities.UserEntity) []UserResponseDTO {
+func MapUserResponseDTOs(users []entity.UserEntity) []UserResponseDTO {
 	result := make([]UserResponseDTO, len(users))
 
 	for key, value := range users {

@@ -1,4 +1,4 @@
-package entities
+package entity
 
 type UserEntity struct {
 	ID           int64  `db:"id"`

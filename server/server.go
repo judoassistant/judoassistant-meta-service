@@ -3,11 +3,11 @@ package server
 import (
 	"log"
 
-	"github.com/judoassistant/judoassistant-meta-service/controllers"
 	"github.com/judoassistant/judoassistant-meta-service/db"
+	"github.com/judoassistant/judoassistant-meta-service/handler"
 	"github.com/judoassistant/judoassistant-meta-service/middleware"
-	"github.com/judoassistant/judoassistant-meta-service/repositories"
-	"github.com/judoassistant/judoassistant-meta-service/services"
+	"github.com/judoassistant/judoassistant-meta-service/repository"
+	"github.com/judoassistant/judoassistant-meta-service/service"
 )
 
 func Init() {
@@ -20,13 +20,13 @@ func Init() {
 		log.Fatalln(err.Error())
 	}
 
-	tournamentRepository := repositories.NewTournamentRepository(database)
-	tournamentService := services.NewTournamentService(tournamentRepository)
-	tournamentController := controllers.NewTournamentController(tournamentService)
+	tournamentRepository := repository.NewTournamentRepository(database)
+	tournamentService := service.NewTournamentService(tournamentRepository)
+	tournamentController := handler.NewTournamentController(tournamentService)
 
-	userRepository := repositories.NewUserRepository(database)
-	userService := services.NewUserService(userRepository)
-	userController := controllers.NewUserController(userService)
+	userRepository := repository.NewUserRepository(database)
+	userService := service.NewUserService(userRepository)
+	userController := handler.NewUserController(userService)
 
 	if err := InitScaffoldingData(userService, tournamentService); err != nil {
 		log.Fatalln(err)

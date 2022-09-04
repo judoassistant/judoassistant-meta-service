@@ -3,7 +3,7 @@ package dto
 import (
 	"time"
 
-	"github.com/judoassistant/judoassistant-meta-service/entities"
+	"github.com/judoassistant/judoassistant-meta-service/entity"
 )
 
 type TournamentUpdateRequestDTO struct {
@@ -12,7 +12,7 @@ type TournamentUpdateRequestDTO struct {
 	Date     time.Time `json:"date"`
 }
 
-func MapToTournamentEntity(dto *TournamentUpdateRequestDTO, entity *entities.TournamentEntity) {
+func MapToTournamentEntity(dto *TournamentUpdateRequestDTO, entity *entity.TournamentEntity) {
 	entity.Name = dto.Name
 	entity.Location = dto.Location
 	entity.Date = dto.Date
