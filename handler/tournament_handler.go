@@ -9,22 +9,32 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/service"
 )
 
-type TournamentHandler struct {
+type TournamentHandler interface {
+	Create(c *gin.Context)
+	Delete(c *gin.Context)
+	Get(c *gin.Context)
+	GetPast(c *gin.Context)
+	GetUpcoming(c *gin.Context)
+	Index(c *gin.Context)
+	Update(c *gin.Context)
+}
+
+type tournamentHandler struct {
 	tournamentService service.TournamentService
 }
 
-func NewTournamentHandler(tournamentService service.TournamentService) *TournamentHandler {
-	return &TournamentHandler{tournamentService}
+func NewTournamentHandler(tournamentService service.TournamentService) TournamentHandler {
+	return &tournamentHandler{tournamentService}
 }
 
-func (controller *TournamentHandler) Index(c *gin.Context) {
+func (handler *tournamentHandler) Index(c *gin.Context) {
 	queryParams := dto.TournamentIndexQueryDTO{}
 	if err := c.ShouldBindQuery(&queryParams); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	tournaments, err := controller.tournamentService.Get(queryParams.After, 10)
+	tournaments, err := handler.tournamentService.Get(queryParams.After, 10)
 	if err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -33,8 +43,8 @@ func (controller *TournamentHandler) Index(c *gin.Context) {
 	c.JSON(http.StatusOK, tournaments)
 }
 
-func (controller *TournamentHandler) GetPast(c *gin.Context) {
-	tournaments, err := controller.tournamentService.GetPast(10)
+func (handler *tournamentHandler) GetPast(c *gin.Context) {
+	tournaments, err := handler.tournamentService.GetPast(10)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -43,8 +53,8 @@ func (controller *TournamentHandler) GetPast(c *gin.Context) {
 	c.JSON(http.StatusOK, tournaments)
 }
 
-func (controller *TournamentHandler) GetUpcoming(c *gin.Context) {
-	tournaments, err := controller.tournamentService.GetUpcoming(10)
+func (handler *tournamentHandler) GetUpcoming(c *gin.Context) {
+	tournaments, err := handler.tournamentService.GetUpcoming(10)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -53,7 +63,7 @@ func (controller *TournamentHandler) GetUpcoming(c *gin.Context) {
 	c.JSON(http.StatusOK, tournaments)
 }
 
-func (controller *TournamentHandler) Create(c *gin.Context) {
+func (handler *tournamentHandler) Create(c *gin.Context) {
 	request := dto.TournamentCreationRequestDTO{}
 	if err := c.BindJSON(&request); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -62,7 +72,7 @@ func (controller *TournamentHandler) Create(c *gin.Context) {
 
 	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 
-	response, err := controller.tournamentService.Create(user, &request)
+	response, err := handler.tournamentService.Create(user, &request)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -71,14 +81,14 @@ func (controller *TournamentHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (controller *TournamentHandler) Get(c *gin.Context) {
+func (handler *tournamentHandler) Get(c *gin.Context) {
 	query := dto.TournamentQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	tournament, err := controller.tournamentService.GetById(query.ID)
+	tournament, err := handler.tournamentService.GetById(query.ID)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -87,7 +97,7 @@ func (controller *TournamentHandler) Get(c *gin.Context) {
 	c.JSON(http.StatusOK, tournament)
 }
 
-func (controller *TournamentHandler) Update(c *gin.Context) {
+func (handler *tournamentHandler) Update(c *gin.Context) {
 	query := dto.TournamentQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -101,7 +111,7 @@ func (controller *TournamentHandler) Update(c *gin.Context) {
 	}
 
 	// Todo: Verify ownership
-	tournament, err := controller.tournamentService.Update(query.ID, &request)
+	tournament, err := handler.tournamentService.Update(query.ID, &request)
 	if err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
@@ -110,6 +120,6 @@ func (controller *TournamentHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, tournament)
 }
 
-func (controller *TournamentHandler) Delete(c *gin.Context) {
+func (handler *tournamentHandler) Delete(c *gin.Context) {
 	c.AbortWithStatus(http.StatusNotImplemented) // TODO: Implement
 }

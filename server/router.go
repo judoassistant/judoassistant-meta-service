@@ -5,7 +5,7 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/handler"
 )
 
-func NewRouter(authMiddleware gin.HandlerFunc, adminAreaMiddleware gin.HandlerFunc, tournamentHandler *handler.TournamentHandler, userHandler *handler.UserHandler) *gin.Engine {
+func NewRouter(authMiddleware gin.HandlerFunc, adminAreaMiddleware gin.HandlerFunc, tournamentHandler handler.TournamentHandler, userHandler handler.UserHandler) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(authMiddleware)
