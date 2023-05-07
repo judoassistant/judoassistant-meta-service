@@ -38,8 +38,8 @@ func NewRouter(conf *config.Config, loggingMiddleware, authMiddleware, adminArea
 	router.PUT("/users/:id/update_password", adminAreaMiddleware, userHandler.UpdatePassword)
 
 	router.GET("/tournaments", tournamentHandler.Index)
-	router.GET("/tournaments/past", tournamentHandler.GetPast)
-	router.GET("/tournaments/upcoming", tournamentHandler.GetUpcoming)
+	router.GET("/tournaments/past", tournamentHandler.ListPast)
+	router.GET("/tournaments/upcoming", tournamentHandler.ListUpcoming)
 	router.POST("/tournaments", tournamentHandler.Create)
 	router.GET("/tournaments/:id", tournamentHandler.Get)
 	router.PUT("/tournaments/:id", tournamentHandler.Update)

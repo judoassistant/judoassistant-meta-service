@@ -10,12 +10,12 @@ import (
 
 type TournamentRepository interface {
 	Create(entity *entity.TournamentEntity) error
-	GetByDateGreaterThanEqualAndNotDeleted(minimumDate time.Time, limit int) ([]entity.TournamentEntity, error)
-	GetByDateLessThanAndNotDeleted(maximumDate time.Time, limit int) ([]entity.TournamentEntity, error)
-	GetByID(id int64) (*entity.TournamentEntity, error)
 	DeleteByID(id int64) error
-	GetByIDGreaterThanAndNotDeleted(after int64, count int) ([]entity.TournamentEntity, error)
-	GetByOwner(ownerID int64) ([]entity.TournamentEntity, error)
+	GetByID(id int64) (*entity.TournamentEntity, error)
+	ListByDateGreaterThanEqual(minimumDate time.Time, limit int) ([]entity.TournamentEntity, error)
+	ListByDateLessThan(maximumDate time.Time, limit int) ([]entity.TournamentEntity, error)
+	ListByIDGreaterThan(after int64, count int) ([]entity.TournamentEntity, error)
+	ListByOwner(ownerID int64) ([]entity.TournamentEntity, error)
 	Update(entity *entity.TournamentEntity) error
 }
 
@@ -59,44 +59,44 @@ func (repository *tournamentRepository) GetByID(id int64) (*entity.TournamentEnt
 	return &tournament, nil
 }
 
-func (repository *tournamentRepository) GetByOwner(ownerID int64) ([]entity.TournamentEntity, error) {
+func (repository *tournamentRepository) ListByOwner(ownerID int64) ([]entity.TournamentEntity, error) {
 	tournaments := []entity.TournamentEntity{}
 	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE owner = $1", ownerID)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get tournanent")
+		return nil, errors.Wrap(err, "unable to list tournanents")
 	}
 	return tournaments, nil
 }
 
-func (repository *tournamentRepository) GetByIDGreaterThanAndNotDeleted(after int64, count int) ([]entity.TournamentEntity, error) {
+func (repository *tournamentRepository) ListByIDGreaterThan(after int64, count int) ([]entity.TournamentEntity, error) {
 	tournaments := []entity.TournamentEntity{}
 	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE id >= $1 AND is_deleted = 0 ORDER BY id LIMIT $2", after, count)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get tournanents")
+		return nil, errors.Wrap(err, "unable to list tournanents")
 	}
 	return tournaments, nil
 }
 
-func (repository *tournamentRepository) GetByDateGreaterThanEqualAndNotDeleted(minimumDate time.Time, limit int) ([]entity.TournamentEntity, error) {
+func (repository *tournamentRepository) ListByDateGreaterThanEqual(minimumDate time.Time, limit int) ([]entity.TournamentEntity, error) {
 	tournaments := []entity.TournamentEntity{}
 	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE date >= $1 AND is_deleted = 0 ORDER BY date LIMIT $2", minimumDate, limit)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get tournanets")
+		return nil, errors.Wrap(err, "unable to list tournanets")
 	}
 	return tournaments, nil
 }
 
-func (repository *tournamentRepository) GetByDateLessThanAndNotDeleted(maximumDate time.Time, limit int) ([]entity.TournamentEntity, error) {
+func (repository *tournamentRepository) ListByDateLessThan(maximumDate time.Time, limit int) ([]entity.TournamentEntity, error) {
 	tournaments := []entity.TournamentEntity{}
 	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE date < $1 AND is_deleted = 0 ORDER BY date LIMIT $2", maximumDate, limit)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get tournaments")
+		return nil, errors.Wrap(err, "unable to list tournaments")
 	}
 	return tournaments, nil
 }
 
 func (repository *tournamentRepository) DeleteByID(id int64) error {
-	result, err := repository.db.Exec("DELETE FROM tournaments WHERE id = $1", id)
+	result, err := repository.db.Exec("UPDATE tournaments SET is_deleted = 1 WHERE id = $1 AND is_deleted = 0", id)
 	if err != nil {
 		return errors.Wrap(err, "unable to delete tournament")
 	}

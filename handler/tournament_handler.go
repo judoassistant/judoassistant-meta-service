@@ -14,8 +14,8 @@ type TournamentHandler interface {
 	Create(c *gin.Context)
 	Delete(c *gin.Context)
 	Get(c *gin.Context)
-	GetPast(c *gin.Context)
-	GetUpcoming(c *gin.Context)
+	ListPast(c *gin.Context)
+	ListUpcoming(c *gin.Context)
 	Index(c *gin.Context)
 	Update(c *gin.Context)
 }
@@ -40,9 +40,9 @@ func (handler *tournamentHandler) Index(c *gin.Context) {
 		return
 	}
 
-	tournaments, err := handler.tournamentService.Get(queryParams.After, 10)
+	tournaments, err := handler.tournamentService.List(queryParams.After, 10)
 	if err != nil {
-		handler.logger.Warn("Unable to get tournaments", zap.Error(err))
+		handler.logger.Warn("Unable to list tournaments", zap.Error(err))
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -50,10 +50,10 @@ func (handler *tournamentHandler) Index(c *gin.Context) {
 	c.JSON(http.StatusOK, tournaments)
 }
 
-func (handler *tournamentHandler) GetPast(c *gin.Context) {
-	tournaments, err := handler.tournamentService.GetPast(10)
+func (handler *tournamentHandler) ListPast(c *gin.Context) {
+	tournaments, err := handler.tournamentService.ListPast(10)
 	if err != nil {
-		handler.logger.Warn("Unable to get past tournaments", zap.Error(err))
+		handler.logger.Warn("Unable to list past tournaments", zap.Error(err))
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -61,10 +61,10 @@ func (handler *tournamentHandler) GetPast(c *gin.Context) {
 	c.JSON(http.StatusOK, tournaments)
 }
 
-func (handler *tournamentHandler) GetUpcoming(c *gin.Context) {
-	tournaments, err := handler.tournamentService.GetUpcoming(10)
+func (handler *tournamentHandler) ListUpcoming(c *gin.Context) {
+	tournaments, err := handler.tournamentService.ListUpcoming(10)
 	if err != nil {
-		handler.logger.Warn("Unable to get upcoming tournaments", zap.Error(err))
+		handler.logger.Warn("Unable to list upcoming tournaments", zap.Error(err))
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}

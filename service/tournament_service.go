@@ -12,11 +12,11 @@ import (
 type TournamentService interface {
 	Create(user *dto.UserResponseDTO, tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error)
 	Delete(id int64) error
-	Get(after int64, count int) ([]dto.TournamentResponseDTO, error)
 	GetByID(id int64) (*dto.TournamentResponseDTO, error)
-	GetByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error)
-	GetPast(count int) ([]dto.TournamentResponseDTO, error)
-	GetUpcoming(count int) ([]dto.TournamentResponseDTO, error)
+	List(after int64, count int) ([]dto.TournamentResponseDTO, error)
+	ListByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error)
+	ListPast(count int) ([]dto.TournamentResponseDTO, error)
+	ListUpcoming(count int) ([]dto.TournamentResponseDTO, error)
 	Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error)
 }
 
@@ -32,9 +32,9 @@ func NewTournamentService(tournamentRepository repository.TournamentRepository, 
 	}
 }
 
-func (s *tournamentService) GetPast(count int) ([]dto.TournamentResponseDTO, error) {
+func (s *tournamentService) ListPast(count int) ([]dto.TournamentResponseDTO, error) {
 	today := s.clock.Now()
-	tournaments, err := s.tournamentRepository.GetByDateLessThanAndNotDeleted(today, 10) // TODO: find nice place to put constants
+	tournaments, err := s.tournamentRepository.ListByDateLessThan(today, 10)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list tournaments")
 	}
@@ -42,9 +42,9 @@ func (s *tournamentService) GetPast(count int) ([]dto.TournamentResponseDTO, err
 	return mappers.TournamentToResponseDTOs(tournaments), nil
 }
 
-func (s *tournamentService) GetUpcoming(count int) ([]dto.TournamentResponseDTO, error) {
+func (s *tournamentService) ListUpcoming(count int) ([]dto.TournamentResponseDTO, error) {
 	today := s.clock.Now()
-	tournaments, err := s.tournamentRepository.GetByDateGreaterThanEqualAndNotDeleted(today, 10) // TODO: find nice place to put constants
+	tournaments, err := s.tournamentRepository.ListByDateGreaterThanEqual(today, 10)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list tournaments")
 	}
@@ -52,10 +52,10 @@ func (s *tournamentService) GetUpcoming(count int) ([]dto.TournamentResponseDTO,
 	return mappers.TournamentToResponseDTOs(tournaments), nil
 }
 
-func (s *tournamentService) Get(after int64, count int) ([]dto.TournamentResponseDTO, error) {
-	tournaments, err := s.tournamentRepository.GetByIDGreaterThanAndNotDeleted(after, count)
+func (s *tournamentService) List(after int64, count int) ([]dto.TournamentResponseDTO, error) {
+	tournaments, err := s.tournamentRepository.ListByIDGreaterThan(after, count)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to list tournaments")
 	}
 
 	return mappers.TournamentToResponseDTOs(tournaments), nil
@@ -71,10 +71,10 @@ func (s *tournamentService) GetByID(id int64) (*dto.TournamentResponseDTO, error
 	return &response, nil
 }
 
-func (s *tournamentService) GetByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error) {
-	tournaments, err := s.tournamentRepository.GetByOwner(ownerID)
+func (s *tournamentService) ListByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error) {
+	tournaments, err := s.tournamentRepository.ListByOwner(ownerID)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get tournament")
+		return nil, errors.Wrap(err, "unable to list tournament")
 	}
 
 	return mappers.TournamentToResponseDTOs(tournaments), nil
