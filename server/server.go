@@ -5,7 +5,6 @@ import (
 
 	"github.com/benbjohnson/clock"
 	"github.com/judoassistant/judoassistant-meta-service/config"
-	"github.com/judoassistant/judoassistant-meta-service/db"
 	"github.com/judoassistant/judoassistant-meta-service/handler"
 	"github.com/judoassistant/judoassistant-meta-service/middleware"
 	"github.com/judoassistant/judoassistant-meta-service/repository"
@@ -24,14 +23,9 @@ func Init() {
 		return
 	}
 
-	database, err := db.Init()
+	database, err := repository.NewDatabase(config)
 	if err != nil {
 		logger.Fatal("Unable to initialize database", zap.Error(err))
-		return
-	}
-
-	if err := db.Migrate(database); err != nil {
-		logger.Fatal("Unable to perform database migration", zap.Error(err))
 		return
 	}
 

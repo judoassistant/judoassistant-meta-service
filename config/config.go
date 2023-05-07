@@ -27,6 +27,8 @@ type Config struct {
 
 	Port int      `mapstructore:"port"`
 	URL  []string `mapstructore:"url"`
+
+	DatabasePath string `mapstructure:"database_path"`
 }
 
 func getEnvironment() (Environment, error) {

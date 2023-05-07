@@ -5,3 +5,4 @@ admin_default_last_name: "Adminson"
 port: 8080
 url:
   - "127.0.0.0"
+database_path: "judoassistant.development.db"

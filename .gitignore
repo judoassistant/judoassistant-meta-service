@@ -1,2 +1,4 @@
 config/config.development.yaml
 config/config.production.yaml
+judoassistant.development.db
+judoassistant.production.db
