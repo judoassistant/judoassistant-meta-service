@@ -7,6 +7,7 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/middleware"
 	"github.com/judoassistant/judoassistant-meta-service/service"
+	"go.uber.org/zap"
 )
 
 type UserHandler interface {
@@ -19,10 +20,14 @@ type UserHandler interface {
 
 type userHandler struct {
 	userService service.UserService
+	logger      *zap.Logger
 }
 
-func NewUserHandler(userService service.UserService) UserHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService service.UserService, logger *zap.Logger) UserHandler {
+	return &userHandler{
+		userService: userService,
+		logger:      logger,
+	}
 }
 
 func (handler *userHandler) Index(c *gin.Context) {
@@ -39,12 +44,14 @@ func (handler *userHandler) Index(c *gin.Context) {
 func (handler *userHandler) Create(c *gin.Context) {
 	request := dto.UserRegistrationRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
+		handler.logger.Info("Unable to map user registration request", zap.Error(err))
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	response, err := handler.userService.Register(&request)
 	if err != nil {
+		handler.logger.Warn("Unable to register user", zap.Error(err))
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -55,6 +62,7 @@ func (handler *userHandler) Create(c *gin.Context) {
 func (handler *userHandler) Get(c *gin.Context) {
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
+		handler.logger.Info("Unable to map user get request", zap.Error(err))
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
@@ -62,12 +70,14 @@ func (handler *userHandler) Get(c *gin.Context) {
 	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 
 	if query.ID != authorizedUser.ID {
+		handler.logger.Info("Unable to authorize user get request")
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
 	user, err := handler.userService.GetById(query.ID)
 	if err != nil {
+		handler.logger.Warn("Unable to get user", zap.Error(err))
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -77,12 +87,14 @@ func (handler *userHandler) Get(c *gin.Context) {
 func (handler *userHandler) UpdatePassword(c *gin.Context) {
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
+		handler.logger.Info("Unable to map update password request", zap.Error(err))
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	request := dto.UserPasswordUpdateRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
+		handler.logger.Info("Unable to map update password request", zap.Error(err))
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
@@ -90,12 +102,14 @@ func (handler *userHandler) UpdatePassword(c *gin.Context) {
 	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 
 	if query.ID != authorizedUser.ID {
+		handler.logger.Info("Unable to authorize update password request")
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
 	user, err := handler.userService.UpdatePassword(query.ID, request.Password)
 	if err != nil {
+		handler.logger.Warn("Unable to update password")
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
@@ -106,24 +120,28 @@ func (handler *userHandler) UpdatePassword(c *gin.Context) {
 func (handler *userHandler) Update(c *gin.Context) {
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
+		handler.logger.Info("Unable to authorize user get request")
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	request := dto.UserUpdateRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
+		handler.logger.Info("Unable to authorize user get request")
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 	if query.ID != authorizedUser.ID {
+		handler.logger.Info("Unable to authorize user get request")
 		c.AbortWithStatus(http.StatusForbidden)
 		return
 	}
 
 	user, err := handler.userService.Update(query.ID, &request)
 	if err != nil {
+		handler.logger.Warn("Unable to update user")
 		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}

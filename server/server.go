@@ -9,6 +9,7 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/middleware"
 	"github.com/judoassistant/judoassistant-meta-service/repository"
 	"github.com/judoassistant/judoassistant-meta-service/service"
+	"go.uber.org/zap"
 )
 
 func Init() {
@@ -22,14 +23,16 @@ func Init() {
 	}
 
 	clock := clock.New()
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
 
 	tournamentRepository := repository.NewTournamentRepository(database)
 	tournamentService := service.NewTournamentService(tournamentRepository, clock)
-	tournamentHandler := handler.NewTournamentHandler(tournamentService)
+	tournamentHandler := handler.NewTournamentHandler(tournamentService, logger)
 
 	userRepository := repository.NewUserRepository(database)
 	userService := service.NewUserService(userRepository)
-	userHandler := handler.NewUserHandler(userService)
+	userHandler := handler.NewUserHandler(userService, logger)
 
 	if err := InitScaffoldingData(userService, tournamentService, clock); err != nil {
 		log.Fatalln(err)

@@ -7,6 +7,7 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/middleware"
 	"github.com/judoassistant/judoassistant-meta-service/service"
+	"go.uber.org/zap"
 )
 
 type TournamentHandler interface {
@@ -21,10 +22,14 @@ type TournamentHandler interface {
 
 type tournamentHandler struct {
 	tournamentService service.TournamentService
+	logger            *zap.Logger
 }
 
-func NewTournamentHandler(tournamentService service.TournamentService) TournamentHandler {
-	return &tournamentHandler{tournamentService}
+func NewTournamentHandler(tournamentService service.TournamentService, logger *zap.Logger) TournamentHandler {
+	return &tournamentHandler{
+		tournamentService: tournamentService,
+		logger:            logger,
+	}
 }
 
 func (handler *tournamentHandler) Index(c *gin.Context) {
