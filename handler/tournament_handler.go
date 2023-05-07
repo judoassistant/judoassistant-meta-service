@@ -34,7 +34,7 @@ func NewTournamentHandler(tournamentService service.TournamentService, logger *z
 
 func (handler *tournamentHandler) Index(c *gin.Context) {
 	queryParams := dto.TournamentIndexQueryDTO{}
-	if err := c.ShouldBindQuery(&queryParams); err != nil {
+	if err := c.ShouldBindUri(&queryParams); err != nil {
 		handler.logger.Info("Unable to map tournament index query", zap.Error(err))
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -74,7 +74,7 @@ func (handler *tournamentHandler) ListUpcoming(c *gin.Context) {
 
 func (handler *tournamentHandler) Create(c *gin.Context) {
 	request := dto.TournamentCreationRequestDTO{}
-	if err := c.BindJSON(&request); err != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
 		handler.logger.Info("Unable map create tournament request", zap.Error(err))
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -94,7 +94,7 @@ func (handler *tournamentHandler) Create(c *gin.Context) {
 
 func (handler *tournamentHandler) Get(c *gin.Context) {
 	query := dto.TournamentQueryDTO{}
-	if err := c.ShouldBindQuery(&query); err != nil {
+	if err := c.ShouldBindUri(&query); err != nil {
 		handler.logger.Info("Unable map get tournament request", zap.Error(err))
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -112,7 +112,7 @@ func (handler *tournamentHandler) Get(c *gin.Context) {
 
 func (handler *tournamentHandler) Update(c *gin.Context) {
 	query := dto.TournamentQueryDTO{}
-	if err := c.ShouldBindQuery(&query); err != nil {
+	if err := c.ShouldBindUri(&query); err != nil {
 		handler.logger.Info("Unable to map query tournament request", zap.Error(err))
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -138,7 +138,7 @@ func (handler *tournamentHandler) Update(c *gin.Context) {
 
 func (handler *tournamentHandler) Delete(c *gin.Context) {
 	query := dto.TournamentQueryDTO{}
-	if err := c.ShouldBindQuery(&query); err != nil {
+	if err := c.ShouldBindUri(&query); err != nil {
 		handler.logger.Info("Unable to map query tournament request", zap.Error(err))
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
