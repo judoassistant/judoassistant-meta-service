@@ -24,6 +24,7 @@ func InitScaffoldingData(userService service.UserService, tournamentService serv
 		Password:  config.AdminDefaultPassword,
 		FirstName: config.AdminDefaultFirstName,
 		LastName:  config.AdminDefaultLastName,
+		IsAdmin:   true,
 	}
 
 	user, err := userService.Register(&userRequest)

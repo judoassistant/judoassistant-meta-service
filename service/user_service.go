@@ -52,7 +52,7 @@ func (s *userService) Register(request *dto.UserRegistrationRequestDTO) (*dto.Us
 		LastName:     request.LastName,
 		Email:        request.Email,
 		PasswordHash: passwordHash,
-		IsAdmin:      false,
+		IsAdmin:      request.IsAdmin,
 	}
 
 	if err := s.userRepository.Create(&userEntity); err != nil {
