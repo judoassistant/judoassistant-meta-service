@@ -32,9 +32,16 @@ func (repository *userRepository) Create(entity *entity.UserEntity) error {
 }
 
 func (repository *userRepository) Update(entity *entity.UserEntity) error {
-	_, err := repository.db.Exec("UPDATE users SET first_name = $2, last_name = $3, email = $4, password_hash = $5, is_admin = $6 WHERE id = $1", entity.ID, entity.FirstName, entity.LastName, entity.Email, entity.PasswordHash, entity.IsAdmin)
+	result, err := repository.db.Exec("UPDATE users SET first_name = $2, last_name = $3, email = $4, password_hash = $5, is_admin = $6 WHERE id = $1", entity.ID, entity.FirstName, entity.LastName, entity.Email, entity.PasswordHash, entity.IsAdmin)
 	if err != nil {
 		return errors.Wrap(err, "unable to update user")
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return errors.Wrap(err, "unable to get rowsAffected")
+	}
+	if rowsAffected == 0 {
+		return errors.New("user does not exist")
 	}
 	return nil
 }

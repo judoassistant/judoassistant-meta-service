@@ -10,13 +10,14 @@ import (
 )
 
 type TournamentService interface {
+	Create(user *dto.UserResponseDTO, tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error)
+	Delete(id int64) error
+	Get(after int64, count int) ([]dto.TournamentResponseDTO, error)
+	GetByID(id int64) (*dto.TournamentResponseDTO, error)
+	GetByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error)
 	GetPast(count int) ([]dto.TournamentResponseDTO, error)
 	GetUpcoming(count int) ([]dto.TournamentResponseDTO, error)
-	Get(after int64, count int) ([]dto.TournamentResponseDTO, error)
-	GetById(id int64) (*dto.TournamentResponseDTO, error)
-	GetByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error)
 	Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error)
-	Create(user *dto.UserResponseDTO, tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error)
 }
 
 type tournamentService struct {
@@ -52,7 +53,7 @@ func (s *tournamentService) GetUpcoming(count int) ([]dto.TournamentResponseDTO,
 }
 
 func (s *tournamentService) Get(after int64, count int) ([]dto.TournamentResponseDTO, error) {
-	tournaments, err := s.tournamentRepository.GetByIdGreaterThanAndNotDeleted(after, count)
+	tournaments, err := s.tournamentRepository.GetByIDGreaterThanAndNotDeleted(after, count)
 	if err != nil {
 		return nil, err
 	}
@@ -60,8 +61,8 @@ func (s *tournamentService) Get(after int64, count int) ([]dto.TournamentRespons
 	return mappers.TournamentToResponseDTOs(tournaments), nil
 }
 
-func (s *tournamentService) GetById(id int64) (*dto.TournamentResponseDTO, error) {
-	tournament, err := s.tournamentRepository.GetById(id)
+func (s *tournamentService) GetByID(id int64) (*dto.TournamentResponseDTO, error) {
+	tournament, err := s.tournamentRepository.GetByID(id)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get tournament")
 	}
@@ -80,7 +81,7 @@ func (s *tournamentService) GetByOwner(ownerID int64) ([]dto.TournamentResponseD
 }
 
 func (s *tournamentService) Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error) {
-	tournament, err := s.tournamentRepository.GetById(id)
+	tournament, err := s.tournamentRepository.GetByID(id)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get tournament")
 	}
@@ -110,4 +111,12 @@ func (s *tournamentService) Create(user *dto.UserResponseDTO, request *dto.Tourn
 
 	response := mappers.TournamentToResponseDTO(tournament)
 	return &response, nil
+}
+
+func (s *tournamentService) Delete(id int64) error {
+	if err := s.tournamentRepository.DeleteByID(id); err != nil {
+		return errors.Wrap(err, "unable to delete tournament")
+	}
+
+	return nil
 }

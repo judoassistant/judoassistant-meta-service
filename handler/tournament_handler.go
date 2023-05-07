@@ -100,7 +100,7 @@ func (handler *tournamentHandler) Get(c *gin.Context) {
 		return
 	}
 
-	tournament, err := handler.tournamentService.GetById(query.ID)
+	tournament, err := handler.tournamentService.GetByID(query.ID)
 	if err != nil {
 		handler.logger.Warn("Unable to get tournament", zap.Error(err))
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -137,5 +137,19 @@ func (handler *tournamentHandler) Update(c *gin.Context) {
 }
 
 func (handler *tournamentHandler) Delete(c *gin.Context) {
-	c.AbortWithStatus(http.StatusNotImplemented) // TODO: Implement
+	query := dto.TournamentQueryDTO{}
+	if err := c.ShouldBindQuery(&query); err != nil {
+		handler.logger.Info("Unable to map query tournament request", zap.Error(err))
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	// TOD: Verify ownership
+	if err := handler.tournamentService.Delete(query.ID); err != nil {
+		handler.logger.Warn("Unable to delete tournament", zap.Error(err))
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	c.Status(http.StatusOK)
 }
