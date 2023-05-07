@@ -126,7 +126,7 @@ func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 
 	if err != nil {
-		return "", errors.WrapCode(err, "unable to hash password", errors.CodeInternal)
+		return "", errors.WrapWithCode(err, "unable to hash password", errors.CodeInternal)
 	}
 
 	return string(bytes), nil

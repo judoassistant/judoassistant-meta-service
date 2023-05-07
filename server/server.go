@@ -14,7 +14,7 @@ import (
 
 func Init() {
 	clock := clock.New()
-	logger, _ := zap.NewProduction()
+	logger, _ := zap.NewDevelopment() // TODO: Use production
 	defer logger.Sync()
 
 	config, err := config.NewConfig()

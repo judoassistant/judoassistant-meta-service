@@ -6,7 +6,7 @@ import (
 
 func New(msg string, code int) error {
 	return &codedError{
-		wrappedErr: errors.Errorf(msg).(StackTracer),
+		wrappedErr: errors.Errorf(msg).(stackTracer),
 		code:       code,
 	}
 }
@@ -14,31 +14,31 @@ func New(msg string, code int) error {
 func Wrap(err error, msg string) error {
 	return &codedError{
 		msg:        msg,
-		wrappedErr: withStack(err),
+		wrappedErr: toStackTracer(err),
 		code:       Code(err),
 	}
 }
 
-func WrapCode(err error, msg string, code int) error {
+func WrapWithCode(err error, msg string, code int) error {
 	return &codedError{
 		msg:        msg,
-		wrappedErr: withStack(err),
+		wrappedErr: toStackTracer(err),
 		code:       code,
 	}
 }
 
 func Code(err error) int {
-	if coder, ok := err.(Coder); ok {
+	if coder, ok := err.(coder); ok {
 		return coder.Code()
 	}
 
 	return CodeInternal
 }
 
-func withStack(err error) StackTracer {
-	if stackTracer, ok := err.(StackTracer); ok {
+func toStackTracer(err error) stackTracer {
+	if stackTracer, ok := err.(stackTracer); ok {
 		return stackTracer
 	}
 
-	return errors.WithStack(err).(StackTracer)
+	return errors.WithStack(err).(stackTracer)
 }

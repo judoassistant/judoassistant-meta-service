@@ -44,7 +44,7 @@ func (handler *userHandler) Index(c *gin.Context) error {
 func (handler *userHandler) Create(c *gin.Context) error {
 	request := dto.UserRegistrationRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
-		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
+		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	response, err := handler.userService.Register(&request)
@@ -59,7 +59,7 @@ func (handler *userHandler) Create(c *gin.Context) error {
 func (handler *userHandler) Get(c *gin.Context) error {
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
-		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
+		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
@@ -79,12 +79,12 @@ func (handler *userHandler) Get(c *gin.Context) error {
 func (handler *userHandler) UpdatePassword(c *gin.Context) error {
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
-		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
+		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	request := dto.UserPasswordUpdateRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
-		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
+		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
@@ -104,12 +104,12 @@ func (handler *userHandler) UpdatePassword(c *gin.Context) error {
 func (handler *userHandler) Update(c *gin.Context) error {
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
-		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
+		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	request := dto.UserUpdateRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
-		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
+		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
