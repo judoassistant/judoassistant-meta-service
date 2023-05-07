@@ -23,7 +23,7 @@ func Init() {
 	}
 
 	clock := clock.New()
-	logger, _ := zap.NewProduction()
+	logger, _ := zap.NewDevelopment()
 	defer logger.Sync()
 
 	tournamentRepository := repository.NewTournamentRepository(database)
@@ -38,8 +38,8 @@ func Init() {
 		log.Fatalln(err)
 	}
 
-	authMiddleware := middleware.BasicAuthMiddleware(userService)
-	adminAreaMiddleware := middleware.AdminAreaMiddleware()
+	authMiddleware := middleware.BasicAuthMiddleware(userService, logger)
+	adminAreaMiddleware := middleware.AdminAreaMiddleware(logger)
 	router := NewRouter(authMiddleware, adminAreaMiddleware, tournamentHandler, userHandler)
 
 	router.SetTrustedProxies([]string{"127.0.0.1"})
