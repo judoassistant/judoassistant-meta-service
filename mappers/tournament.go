@@ -7,6 +7,7 @@ import (
 
 func TournamentToResponseDTO(tournament *entity.TournamentEntity) dto.TournamentResponseDTO {
 	return dto.TournamentResponseDTO{
+		ID:       tournament.ID,
 		Name:     tournament.Name,
 		Location: tournament.Location,
 		Date:     tournament.Date,
