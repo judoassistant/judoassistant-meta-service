@@ -14,16 +14,19 @@ import (
 
 func Init() {
 	clock := clock.New()
-	logger, _ := zap.NewDevelopment() // TODO: Use production
-	defer logger.Sync()
 
-	config, err := config.NewConfig()
+	conf, err := config.NewConfig()
 	if err != nil {
+		logger := newLogger(config.EnvironmentProduction) // Unable to get environment; Default to production environment
 		logger.Fatal("Unable to read config", zap.Error(err))
+		logger.Sync()
 		return
 	}
 
-	database, err := repository.NewDatabase(config)
+	logger := newLogger(conf.Environment)
+	defer logger.Sync()
+
+	database, err := repository.NewDatabase(conf)
 	if err != nil {
 		logger.Fatal("Unable to initialize database", zap.Error(err))
 		return
@@ -37,7 +40,7 @@ func Init() {
 	userService := service.NewUserService(userRepository)
 	userHandler := handler.NewUserHandler(userService, logger)
 
-	if err := InitScaffoldingData(userService, tournamentService, config, logger, clock); err != nil {
+	if err := InitScaffoldingData(userService, tournamentService, conf, logger, clock); err != nil {
 		logger.Fatal("Unable to scaffold database", zap.Error(err))
 		return
 	}
@@ -45,12 +48,23 @@ func Init() {
 	loggingMiddleware := middleware.NewLoggingMiddleware(logger, clock)
 	authMiddleware := middleware.NewBasicAuthMiddleware(userService, logger)
 	adminAreaMiddleware := middleware.NewAdminAreaMiddleware(logger)
-	router, err := NewRouter(config, loggingMiddleware, authMiddleware, adminAreaMiddleware, tournamentHandler, userHandler, logger)
+	router, err := NewRouter(conf, loggingMiddleware, authMiddleware, adminAreaMiddleware, tournamentHandler, userHandler, logger)
 	if err != nil {
 		logger.Fatal("Unable to initialize router", zap.Error(err))
 		return
 	}
 
-	router.SetTrustedProxies(config.URL)
-	router.Run(fmt.Sprintf(":%d", config.Port))
+	router.SetTrustedProxies(conf.URL)
+	router.Run(fmt.Sprintf(":%d", conf.Port))
+}
+
+func newLogger(environment config.Environment) *zap.Logger {
+	var logger *zap.Logger
+	if environment == config.EnvironmentDevelopment {
+		logger, _ = zap.NewDevelopment()
+	} else {
+		logger, _ = zap.NewProduction()
+	}
+
+	return logger
 }
