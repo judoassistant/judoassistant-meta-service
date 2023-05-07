@@ -14,7 +14,7 @@ import (
 
 func Init() {
 	clock := clock.New()
-	logger, _ := zap.NewDevelopment()
+	logger, _ := zap.NewProduction()
 	defer logger.Sync()
 
 	config, err := config.NewConfig()
@@ -45,7 +45,7 @@ func Init() {
 	loggingMiddleware := middleware.NewLoggingMiddleware(logger, clock)
 	authMiddleware := middleware.NewBasicAuthMiddleware(userService, logger)
 	adminAreaMiddleware := middleware.NewAdminAreaMiddleware(logger)
-	router, err := NewRouter(config, loggingMiddleware, authMiddleware, adminAreaMiddleware, tournamentHandler, userHandler)
+	router, err := NewRouter(config, loggingMiddleware, authMiddleware, adminAreaMiddleware, tournamentHandler, userHandler, logger)
 	if err != nil {
 		logger.Fatal("Unable to initialize router", zap.Error(err))
 		return

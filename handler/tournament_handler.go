@@ -12,13 +12,13 @@ import (
 )
 
 type TournamentHandler interface {
-	Create(c *gin.Context)
-	Delete(c *gin.Context)
-	Get(c *gin.Context)
-	ListPast(c *gin.Context)
-	ListUpcoming(c *gin.Context)
-	Index(c *gin.Context)
-	Update(c *gin.Context)
+	Create(c *gin.Context) error
+	Delete(c *gin.Context) error
+	Get(c *gin.Context) error
+	ListPast(c *gin.Context) error
+	ListUpcoming(c *gin.Context) error
+	Index(c *gin.Context) error
+	Update(c *gin.Context) error
 }
 
 type tournamentHandler struct {
@@ -33,134 +33,98 @@ func NewTournamentHandler(tournamentService service.TournamentService, logger *z
 	}
 }
 
-func (handler *tournamentHandler) Index(c *gin.Context) {
+func (handler *tournamentHandler) Index(c *gin.Context) error {
 	queryParams := dto.TournamentIndexQueryDTO{}
 	if err := c.ShouldBindUri(&queryParams); err != nil {
-		handler.logger.Info("Unable to map tournament index query", zap.Error(err))
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
+		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	tournaments, err := handler.tournamentService.List(queryParams.After, 10)
 	if err != nil {
-		handler.logger.Warn("Unable to list tournaments", zap.Error(err))
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return errors.Wrap(err, "unable to list tournaments")
 	}
 
 	c.JSON(http.StatusOK, tournaments)
+	return nil
 }
 
-func (handler *tournamentHandler) ListPast(c *gin.Context) {
+func (handler *tournamentHandler) ListPast(c *gin.Context) error {
 	tournaments, err := handler.tournamentService.ListPast(10)
 	if err != nil {
-		handler.logger.Warn("Unable to list past tournaments", zap.Error(err))
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return errors.Wrap(err, "unable to list past tournaments")
 	}
 
 	c.JSON(http.StatusOK, tournaments)
+	return nil
 }
 
-func (handler *tournamentHandler) ListUpcoming(c *gin.Context) {
+func (handler *tournamentHandler) ListUpcoming(c *gin.Context) error {
 	tournaments, err := handler.tournamentService.ListUpcoming(10)
 	if err != nil {
-		handler.logger.Warn("Unable to list upcoming tournaments", zap.Error(err))
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return errors.Wrap(err, "unable to list upcoming tournaments")
 	}
 
 	c.JSON(http.StatusOK, tournaments)
+	return nil
 }
 
-func (handler *tournamentHandler) Create(c *gin.Context) {
+func (handler *tournamentHandler) Create(c *gin.Context) error {
 	request := dto.TournamentCreationRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
-		handler.logger.Info("Unable map create tournament request", zap.Error(err))
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
+		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 
 	response, err := handler.tournamentService.Create(user, &request)
 	if err != nil {
-		handler.logger.Warn("Unable to create tournament", zap.Error(err))
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return errors.Wrap(err, "unable to create tournament")
 	}
 
 	c.JSON(http.StatusOK, response)
+	return nil
 }
 
-func (handler *tournamentHandler) Get(c *gin.Context) {
+func (handler *tournamentHandler) Get(c *gin.Context) error {
 	query := dto.TournamentQueryDTO{}
 	if err := c.ShouldBindUri(&query); err != nil {
-		handler.logger.Info("Unable map get tournament request", zap.Error(err))
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
+		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	tournament, err := handler.tournamentService.GetByID(query.ID)
 	if err != nil {
-		handler.logger.Warn("Unable to get tournament", zap.Error(err))
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return errors.Wrap(err, "unable to get tournament")
 	}
 
 	c.JSON(http.StatusOK, tournament)
+	return nil
 }
 
-func (handler *tournamentHandler) Update(c *gin.Context) {
+func (handler *tournamentHandler) Update(c *gin.Context) error {
 	query := dto.TournamentQueryDTO{}
 	if err := c.ShouldBindUri(&query); err != nil {
-		handler.logger.Info("Unable to map query tournament request", zap.Error(err))
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
+		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	request := dto.TournamentUpdateRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
-		handler.logger.Info("Unable to map update tournament request", zap.Error(err))
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
+		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	// TODO: Authorize resource-level
 	tournament, err := handler.tournamentService.Update(query.ID, &request)
 	if err != nil {
-		handler.logger.Warn("Unable to update tournament", zap.Error(err))
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return errors.Wrap(err, "unable to update tournament")
 	}
 
 	c.JSON(http.StatusOK, tournament)
+	return nil
 }
 
-func (handler *tournamentHandler) Delete(c *gin.Context) {
-	err := handler.delete(c)
-	if err == nil {
-		c.Status(http.StatusOK)
-		return
-	}
-
-	handler.logger.Warn("Error handling request", zap.Error(err))
-	status := http.StatusInternalServerError
-	if codedErr, ok := err.(errors.Coder); ok {
-		status = codedErr.Code()
-	}
-
-	body := &dto.ErrorResponseDTO{
-		Message: err.Error(),
-	}
-	c.JSON(status, body)
-
-}
-
-func (handler *tournamentHandler) delete(c *gin.Context) error {
+func (handler *tournamentHandler) Delete(c *gin.Context) error {
 	query := dto.TournamentQueryDTO{}
 	if err := c.ShouldBindUri(&query); err != nil {
-		return errors.WrapCode(err, "unable to map query tournament request", errors.CodeBadRequest)
+		return errors.WrapCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	// TODO: Authorize resource-level

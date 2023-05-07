@@ -1,8 +1,6 @@
 package errors
 
 import (
-	"net/http"
-
 	"github.com/pkg/errors"
 )
 
@@ -14,16 +12,11 @@ func New(msg string, code int) error {
 }
 
 func Wrap(err error, msg string) error {
-	result := &codedError{
+	return &codedError{
 		msg:        msg,
 		wrappedErr: withStack(err),
-		code:       http.StatusInternalServerError,
+		code:       Code(err),
 	}
-	if coder, ok := err.(Coder); ok {
-		result.code = coder.Code()
-	}
-
-	return result
 }
 
 func WrapCode(err error, msg string, code int) error {
@@ -32,6 +25,14 @@ func WrapCode(err error, msg string, code int) error {
 		wrappedErr: withStack(err),
 		code:       code,
 	}
+}
+
+func Code(err error) int {
+	if coder, ok := err.(Coder); ok {
+		return coder.Code()
+	}
+
+	return CodeInternal
 }
 
 func withStack(err error) StackTracer {

@@ -16,3 +16,7 @@ const (
 	CodeNotImplemented = http.StatusNotImplemented
 	CodeUnavailable    = http.StatusServiceUnavailable
 )
+
+func IsServerSide(code int) bool {
+	return code >= 500
+}
