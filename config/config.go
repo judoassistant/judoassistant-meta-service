@@ -24,6 +24,9 @@ type Config struct {
 	AdminDefaultPassword  string `mapstructure:"admin_default_pasword"`
 	AdminDefaultFirstName string `mapstructure:"admin_default_first_name"`
 	AdminDefaultLastName  string `mapstructure:"admin_default_last_name"`
+
+	Port int      `mapstructore:"port"`
+	URL  []string `mapstructore:"url"`
 }
 
 func getEnvironment() (Environment, error) {

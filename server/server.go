@@ -1,6 +1,8 @@
 package server
 
 import (
+	"fmt"
+
 	"github.com/benbjohnson/clock"
 	"github.com/judoassistant/judoassistant-meta-service/config"
 	"github.com/judoassistant/judoassistant-meta-service/db"
@@ -55,6 +57,6 @@ func Init() {
 		return
 	}
 
-	router.SetTrustedProxies([]string{"127.0.0.1"})
-	router.Run(":8080")
+	router.SetTrustedProxies(config.URL)
+	router.Run(fmt.Sprintf(":%d", config.Port))
 }

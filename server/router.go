@@ -29,7 +29,6 @@ func NewRouter(conf *config.Config, loggingMiddleware, authMiddleware, adminArea
 	router.Use(loggingMiddleware)
 	router.Use(gin.Recovery())
 
-	router.Use(loggingMiddleware)
 	router.Use(authMiddleware)
 
 	router.GET("/users", adminAreaMiddleware, userHandler.Index)
