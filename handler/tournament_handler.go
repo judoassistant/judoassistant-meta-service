@@ -42,8 +42,8 @@ func (handler *tournamentHandler) Index(c *gin.Context) {
 
 	tournaments, err := handler.tournamentService.Get(queryParams.After, 10)
 	if err != nil {
-		handler.logger.Warn("Unable to get tournament", zap.Error(err))
-		c.AbortWithStatus(http.StatusBadRequest)
+		handler.logger.Warn("Unable to get tournaments", zap.Error(err))
+		c.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 

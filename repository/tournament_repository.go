@@ -62,7 +62,7 @@ func (repository *tournamentRepository) GetByOwner(ownerID int64) ([]entity.Tour
 
 func (repository *tournamentRepository) GetByIdGreaterThanAndNotDeleted(after int64, count int) ([]entity.TournamentEntity, error) {
 	tournaments := []entity.TournamentEntity{}
-	err := repository.db.Get(&tournaments, "SELECT * FROM tournaments WHERE id >= $1 AND is_deleted = 0 LIMIT $2 ORDER BY id", after, count)
+	err := repository.db.Get(&tournaments, "SELECT * FROM tournaments WHERE id >= $1 AND is_deleted = 0 ORDER BY id LIMIT $2", after, count)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get tourmanents")
 	}
@@ -71,7 +71,7 @@ func (repository *tournamentRepository) GetByIdGreaterThanAndNotDeleted(after in
 
 func (repository *tournamentRepository) GetByDateGreaterThanEqualAndNotDeleted(minimumDate time.Time, limit int) ([]entity.TournamentEntity, error) {
 	tournaments := []entity.TournamentEntity{}
-	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE date >= $1 AND is_deleted = 0 LIMIT $2 ORDER BY date", minimumDate, limit)
+	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE date >= $1 AND is_deleted = 0 ORDER BY date LIMIT $2", minimumDate, limit)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get tourmanets")
 	}
@@ -80,7 +80,7 @@ func (repository *tournamentRepository) GetByDateGreaterThanEqualAndNotDeleted(m
 
 func (repository *tournamentRepository) GetByDateLessThanAndNotDeleted(maximumDate time.Time, limit int) ([]entity.TournamentEntity, error) {
 	tournaments := []entity.TournamentEntity{}
-	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE date < $1 AND is_deleted = 0 LIMIT $2 ORDER BY date", maximumDate, limit)
+	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE date < $1 AND is_deleted = 0 ORDER BY date LIMIT $2", maximumDate, limit)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get tournaments")
 	}
