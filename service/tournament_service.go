@@ -19,10 +19,10 @@ type TournamentService interface {
 }
 
 type tournamentService struct {
-	tournamentRepository *repository.TournamentRepository
+	tournamentRepository repository.TournamentRepository
 }
 
-func NewTournamentService(tournamentRepository *repository.TournamentRepository) TournamentService {
+func NewTournamentService(tournamentRepository repository.TournamentRepository) TournamentService {
 	return &tournamentService{tournamentRepository}
 }
 
