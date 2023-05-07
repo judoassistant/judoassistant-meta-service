@@ -4,9 +4,9 @@ import (
 	"github.com/benbjohnson/clock"
 	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/entity"
+	"github.com/judoassistant/judoassistant-meta-service/errors"
 	"github.com/judoassistant/judoassistant-meta-service/mappers"
 	"github.com/judoassistant/judoassistant-meta-service/repository"
-	"github.com/pkg/errors"
 )
 
 type TournamentService interface {

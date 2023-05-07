@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/judoassistant/judoassistant-meta-service/dto"
+	"github.com/judoassistant/judoassistant-meta-service/errors"
 	"github.com/judoassistant/judoassistant-meta-service/middleware"
 	"github.com/judoassistant/judoassistant-meta-service/service"
 	"go.uber.org/zap"
@@ -125,7 +126,7 @@ func (handler *tournamentHandler) Update(c *gin.Context) {
 		return
 	}
 
-	// Todo: Verify ownership
+	// TODO: Authorize resource-level
 	tournament, err := handler.tournamentService.Update(query.ID, &request)
 	if err != nil {
 		handler.logger.Warn("Unable to update tournament", zap.Error(err))
@@ -137,19 +138,35 @@ func (handler *tournamentHandler) Update(c *gin.Context) {
 }
 
 func (handler *tournamentHandler) Delete(c *gin.Context) {
+	err := handler.delete(c)
+	if err == nil {
+		c.Status(http.StatusOK)
+		return
+	}
+
+	handler.logger.Warn("Error handling request", zap.Error(err))
+	status := http.StatusInternalServerError
+	if codedErr, ok := err.(errors.Coder); ok {
+		status = codedErr.Code()
+	}
+
+	body := &dto.ErrorResponseDTO{
+		Message: err.Error(),
+	}
+	c.JSON(status, body)
+
+}
+
+func (handler *tournamentHandler) delete(c *gin.Context) error {
 	query := dto.TournamentQueryDTO{}
 	if err := c.ShouldBindUri(&query); err != nil {
-		handler.logger.Info("Unable to map query tournament request", zap.Error(err))
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
+		return errors.WrapCode(err, "unable to map query tournament request", errors.CodeBadRequest)
 	}
 
-	// TOD: Verify ownership
+	// TODO: Authorize resource-level
 	if err := handler.tournamentService.Delete(query.ID); err != nil {
-		handler.logger.Warn("Unable to delete tournament", zap.Error(err))
-		c.AbortWithStatus(http.StatusInternalServerError)
-		return
+		return errors.Wrap(err, "unable to delete tournament")
 	}
 
-	c.Status(http.StatusOK)
+	return nil
 }

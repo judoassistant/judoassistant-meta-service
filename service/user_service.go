@@ -3,9 +3,9 @@ package service
 import (
 	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/entity"
+	"github.com/judoassistant/judoassistant-meta-service/errors"
 	"github.com/judoassistant/judoassistant-meta-service/mappers"
 	"github.com/judoassistant/judoassistant-meta-service/repository"
-	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -34,7 +34,7 @@ func (s *userService) Authenticate(request *dto.UserAuthenticationRequestDTO) (*
 	}
 
 	if ok := checkPasswordHash(request.Password, userEntity.PasswordHash); !ok {
-		return nil, errors.New("incorrect password")
+		return nil, errors.New("incorrect password", errors.CodeUnauthorized)
 	}
 
 	user := mappers.UserToResponseDTO(userEntity)
@@ -126,7 +126,7 @@ func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 
 	if err != nil {
-		return "", errors.Wrap(err, "unable to hash password")
+		return "", errors.WrapCode(err, "unable to hash password", errors.CodeInternal)
 	}
 
 	return string(bytes), nil
