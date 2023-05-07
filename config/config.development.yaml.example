@@ -1,0 +1,4 @@
+admin_email: "admin@example.com"
+admin_default_password: "password"
+admin_default_first_name: "Admin"
+admin_default_last_name: "Adminson"

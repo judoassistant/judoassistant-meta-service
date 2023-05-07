@@ -1,8 +1,6 @@
 package server
 
 import (
-	"log"
-
 	"github.com/benbjohnson/clock"
 	"github.com/judoassistant/judoassistant-meta-service/config"
 	"github.com/judoassistant/judoassistant-meta-service/db"
@@ -14,15 +12,6 @@ import (
 )
 
 func Init() {
-	database, err := db.Init()
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	if err := db.Migrate(database); err != nil {
-		log.Fatalln(err.Error())
-	}
-
 	clock := clock.New()
 	logger, _ := zap.NewDevelopment()
 	defer logger.Sync()
@@ -30,6 +19,18 @@ func Init() {
 	config, err := config.NewConfig()
 	if err != nil {
 		logger.Fatal("Unable to read config", zap.Error(err))
+		return
+	}
+
+	database, err := db.Init()
+	if err != nil {
+		logger.Fatal("Unable to initialize database", zap.Error(err))
+		return
+	}
+
+	if err := db.Migrate(database); err != nil {
+		logger.Fatal("Unable to perform database migration", zap.Error(err))
+		return
 	}
 
 	tournamentRepository := repository.NewTournamentRepository(database)
@@ -42,11 +43,16 @@ func Init() {
 
 	if err := InitScaffoldingData(userService, tournamentService, config, clock); err != nil {
 		logger.Fatal("Unable to scaffold database", zap.Error(err))
+		return
 	}
 
 	authMiddleware := middleware.BasicAuthMiddleware(userService, logger)
 	adminAreaMiddleware := middleware.AdminAreaMiddleware(logger)
-	router := NewRouter(authMiddleware, adminAreaMiddleware, tournamentHandler, userHandler)
+	router, err := NewRouter(config, authMiddleware, adminAreaMiddleware, tournamentHandler, userHandler)
+	if err != nil {
+		logger.Fatal("Unable to initialize router", zap.Error(err))
+		return
+	}
 
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 	router.Run(":8080")
