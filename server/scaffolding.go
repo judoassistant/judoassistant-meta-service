@@ -1,8 +1,6 @@
 package server
 
 import (
-	"time"
-
 	"github.com/benbjohnson/clock"
 	"github.com/judoassistant/judoassistant-meta-service/config"
 	"github.com/judoassistant/judoassistant-meta-service/dto"
@@ -34,9 +32,12 @@ func InitScaffoldingData(userService service.UserService, tournamentService serv
 		return errors.Wrap(err, "unable to register user")
 	}
 
-	tournament := dto.TournamentCreationRequestDTO{Name: "Bjergkøbing Grand Prix", Location: "Bjergkøbing", Date: time.Now()}
-
-	if _, err := tournamentService.Create(user, &tournament); err != nil {
+	tournament := &dto.TournamentCreationRequestDTO{
+		Name:     "Bjergkøbing Grand Prix",
+		Location: "Bjergkøbing",
+		Date:     clock.Now(),
+	}
+	if _, err := tournamentService.Create(tournament, user); err != nil {
 		return errors.Wrap(err, "unable to create tournament")
 	}
 

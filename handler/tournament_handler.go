@@ -69,14 +69,13 @@ func (handler *tournamentHandler) ListUpcoming(c *gin.Context) error {
 }
 
 func (handler *tournamentHandler) Create(c *gin.Context) error {
-	request := dto.TournamentCreationRequestDTO{}
-	if err := c.ShouldBindJSON(&request); err != nil {
+	request := &dto.TournamentCreationRequestDTO{}
+	if err := c.ShouldBindJSON(request); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
 	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
-
-	response, err := handler.tournamentService.Create(user, &request)
+	response, err := handler.tournamentService.Create(request, user)
 	if err != nil {
 		return errors.Wrap(err, "unable to create tournament")
 	}
@@ -86,8 +85,8 @@ func (handler *tournamentHandler) Create(c *gin.Context) error {
 }
 
 func (handler *tournamentHandler) Get(c *gin.Context) error {
-	query := dto.TournamentQueryDTO{}
-	if err := c.ShouldBindUri(&query); err != nil {
+	query := &dto.TournamentQueryDTO{}
+	if err := c.ShouldBindUri(query); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
@@ -106,13 +105,13 @@ func (handler *tournamentHandler) Update(c *gin.Context) error {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
-	request := dto.TournamentUpdateRequestDTO{}
-	if err := c.ShouldBindJSON(&request); err != nil {
+	request := &dto.TournamentUpdateRequestDTO{}
+	if err := c.ShouldBindJSON(request); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
-	// TODO: Authorize resource-level
-	tournament, err := handler.tournamentService.Update(query.ID, &request)
+	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
+	tournament, err := handler.tournamentService.Update(query.ID, request, user)
 	if err != nil {
 		return errors.Wrap(err, "unable to update tournament")
 	}
@@ -127,8 +126,8 @@ func (handler *tournamentHandler) Delete(c *gin.Context) error {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
-	// TODO: Authorize resource-level
-	if err := handler.tournamentService.Delete(query.ID); err != nil {
+	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
+	if err := handler.tournamentService.Delete(query.ID, user); err != nil {
 		return errors.Wrap(err, "unable to delete tournament")
 	}
 

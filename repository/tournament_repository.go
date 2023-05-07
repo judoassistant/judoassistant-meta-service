@@ -28,7 +28,7 @@ func NewTournamentRepository(db *sqlx.DB) TournamentRepository {
 }
 
 func (repository *tournamentRepository) Create(entity *entity.TournamentEntity) error {
-	err := repository.db.Get(&entity.ID, "INSERT INTO tournaments (name, location, date, owner) VALUES ($1, $2, $3, $4) RETURNING id", entity.Name, entity.Location, entity.Date, entity.Owner)
+	err := repository.db.Get(&entity.ID, "INSERT INTO tournaments (name, location, date, owner, is_deleted) VALUES ($1, $2, $3, $4, $5) RETURNING id", entity.Name, entity.Location, entity.Date, entity.Owner, entity.IsDeleted)
 	if err != nil {
 		return errors.WrapWithCode(err, "unable to create tournament", errorCodeFromDatabaseError(err))
 	}

@@ -10,14 +10,14 @@ import (
 )
 
 type TournamentService interface {
-	Create(user *dto.UserResponseDTO, tournament *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error)
-	Delete(id int64) error
+	Create(tournament *dto.TournamentCreationRequestDTO, user *dto.UserResponseDTO) (*dto.TournamentResponseDTO, error)
+	Delete(id int64, user *dto.UserResponseDTO) error
 	GetByID(id int64) (*dto.TournamentResponseDTO, error)
 	List(after int64, count int) ([]dto.TournamentResponseDTO, error)
 	ListByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error)
 	ListPast(count int) ([]dto.TournamentResponseDTO, error)
 	ListUpcoming(count int) ([]dto.TournamentResponseDTO, error)
-	Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error)
+	Update(id int64, request *dto.TournamentUpdateRequestDTO, user *dto.UserResponseDTO) (*dto.TournamentResponseDTO, error)
 }
 
 type tournamentService struct {
@@ -80,10 +80,13 @@ func (s *tournamentService) ListByOwner(ownerID int64) ([]dto.TournamentResponse
 	return mappers.TournamentToResponseDTOs(tournaments), nil
 }
 
-func (s *tournamentService) Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error) {
+func (s *tournamentService) Update(id int64, request *dto.TournamentUpdateRequestDTO, user *dto.UserResponseDTO) (*dto.TournamentResponseDTO, error) {
 	tournament, err := s.tournamentRepository.GetByID(id)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get tournament")
+	}
+	if tournament.Owner != user.ID {
+		return nil, errors.New("tournament is owned by someone else", errors.CodeForbidden)
 	}
 
 	mappers.TournamentFromUpdateRequestDTO(request, tournament)
@@ -96,7 +99,7 @@ func (s *tournamentService) Update(id int64, request *dto.TournamentUpdateReques
 	return &response, nil
 }
 
-func (s *tournamentService) Create(user *dto.UserResponseDTO, request *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error) {
+func (s *tournamentService) Create(request *dto.TournamentCreationRequestDTO, user *dto.UserResponseDTO) (*dto.TournamentResponseDTO, error) {
 	tournament := &entity.TournamentEntity{
 		Name:     request.Name,
 		Location: request.Location,
@@ -112,7 +115,15 @@ func (s *tournamentService) Create(user *dto.UserResponseDTO, request *dto.Tourn
 	return &response, nil
 }
 
-func (s *tournamentService) Delete(id int64) error {
+func (s *tournamentService) Delete(id int64, user *dto.UserResponseDTO) error {
+	tournament, err := s.tournamentRepository.GetByID(id)
+	if err != nil {
+		return errors.Wrap(err, "unable to get tournament")
+	}
+	if tournament.Owner != user.ID {
+		return errors.New("tournament is owned by someone else", errors.CodeForbidden)
+	}
+
 	if err := s.tournamentRepository.DeleteByID(id); err != nil {
 		return errors.Wrap(err, "unable to delete tournament")
 	}
