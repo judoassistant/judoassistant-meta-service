@@ -55,16 +55,16 @@ func (repository *tournamentRepository) GetByOwner(ownerID int64) ([]entity.Tour
 	tournaments := []entity.TournamentEntity{}
 	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE owner = $1", ownerID)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get tourmanent")
+		return nil, errors.Wrap(err, "unable to get tournanent")
 	}
 	return tournaments, nil
 }
 
 func (repository *tournamentRepository) GetByIdGreaterThanAndNotDeleted(after int64, count int) ([]entity.TournamentEntity, error) {
 	tournaments := []entity.TournamentEntity{}
-	err := repository.db.Get(&tournaments, "SELECT * FROM tournaments WHERE id >= $1 AND is_deleted = 0 ORDER BY id LIMIT $2", after, count)
+	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE id >= $1 AND is_deleted = 0 ORDER BY id LIMIT $2", after, count)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get tourmanents")
+		return nil, errors.Wrap(err, "unable to get tournanents")
 	}
 	return tournaments, nil
 }
@@ -73,7 +73,7 @@ func (repository *tournamentRepository) GetByDateGreaterThanEqualAndNotDeleted(m
 	tournaments := []entity.TournamentEntity{}
 	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE date >= $1 AND is_deleted = 0 ORDER BY date LIMIT $2", minimumDate, limit)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get tourmanets")
+		return nil, errors.Wrap(err, "unable to get tournanets")
 	}
 	return tournaments, nil
 }
