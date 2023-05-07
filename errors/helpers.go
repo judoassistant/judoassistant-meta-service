@@ -6,12 +6,16 @@ import (
 
 func New(msg string, code int) error {
 	return &codedError{
-		wrappedErr: errors.Errorf(msg).(stackTracer),
+		wrappedErr: toStackTracer(errors.Errorf(msg)),
 		code:       code,
 	}
 }
 
 func Wrap(err error, msg string) error {
+	if err == nil {
+		return nil
+	}
+
 	return &codedError{
 		msg:        msg,
 		wrappedErr: toStackTracer(err),
@@ -20,6 +24,10 @@ func Wrap(err error, msg string) error {
 }
 
 func WrapWithCode(err error, msg string, code int) error {
+	if err == nil {
+		return nil
+	}
+
 	return &codedError{
 		msg:        msg,
 		wrappedErr: toStackTracer(err),
@@ -28,10 +36,13 @@ func WrapWithCode(err error, msg string, code int) error {
 }
 
 func Code(err error) int {
+	if err == nil {
+		return CodeOK
+	}
+
 	if coder, ok := err.(coder); ok {
 		return coder.Code()
 	}
-
 	return CodeInternal
 }
 
