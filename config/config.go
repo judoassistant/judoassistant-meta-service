@@ -21,7 +21,7 @@ type Config struct {
 	Environment Environment
 
 	AdminEmail            string `mapstructure:"admin_email"`
-	AdminDefaultPassword  string `mapstructure:"admin_default_pasword"`
+	AdminDefaultPassword  string `mapstructure:"admin_default_password"`
 	AdminDefaultFirstName string `mapstructure:"admin_default_first_name"`
 	AdminDefaultLastName  string `mapstructure:"admin_default_last_name"`
 

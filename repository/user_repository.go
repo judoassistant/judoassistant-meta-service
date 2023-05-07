@@ -40,7 +40,7 @@ func (repository *userRepository) Update(entity *entity.UserEntity) error {
 }
 
 func (repository *userRepository) ExistsByEmail(email string) (bool, error) {
-	var count int64 = 0
+	var count int
 	err := repository.db.Get(&count, "SELECT count(*) FROM users WHERE email = $1 LIMIT 1", email)
 	if err != nil {
 		return false, errors.Wrap(err, "unable to get user")

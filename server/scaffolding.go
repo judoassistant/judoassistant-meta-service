@@ -8,9 +8,10 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/service"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
-func InitScaffoldingData(userService service.UserService, tournamentService service.TournamentService, config *config.Config, clock clock.Clock) error {
+func InitScaffoldingData(userService service.UserService, tournamentService service.TournamentService, config *config.Config, logger *zap.Logger, clock clock.Clock) error {
 	exists, err := userService.ExistsByEmail(config.AdminEmail)
 	if err != nil {
 		return errors.Wrap(err, "unable to get user")
@@ -19,6 +20,7 @@ func InitScaffoldingData(userService service.UserService, tournamentService serv
 		return nil
 	}
 
+	logger.Info("Scaffolding empty database")
 	userRequest := dto.UserRegistrationRequestDTO{
 		Email:     config.AdminEmail,
 		Password:  config.AdminDefaultPassword,

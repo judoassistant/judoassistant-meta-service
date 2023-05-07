@@ -37,7 +37,7 @@ func Init() {
 	userService := service.NewUserService(userRepository)
 	userHandler := handler.NewUserHandler(userService, logger)
 
-	if err := InitScaffoldingData(userService, tournamentService, config, clock); err != nil {
+	if err := InitScaffoldingData(userService, tournamentService, config, logger, clock); err != nil {
 		logger.Fatal("Unable to scaffold database", zap.Error(err))
 		return
 	}
