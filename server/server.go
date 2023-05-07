@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/benbjohnson/clock"
+	"github.com/judoassistant/judoassistant-meta-service/config"
 	"github.com/judoassistant/judoassistant-meta-service/db"
 	"github.com/judoassistant/judoassistant-meta-service/handler"
 	"github.com/judoassistant/judoassistant-meta-service/middleware"
@@ -26,6 +27,11 @@ func Init() {
 	logger, _ := zap.NewDevelopment()
 	defer logger.Sync()
 
+	config, err := config.NewConfig()
+	if err != nil {
+		logger.Fatal("Unable to read config", zap.Error(err))
+	}
+
 	tournamentRepository := repository.NewTournamentRepository(database)
 	tournamentService := service.NewTournamentService(tournamentRepository, clock)
 	tournamentHandler := handler.NewTournamentHandler(tournamentService, logger)
@@ -34,8 +40,8 @@ func Init() {
 	userService := service.NewUserService(userRepository)
 	userHandler := handler.NewUserHandler(userService, logger)
 
-	if err := InitScaffoldingData(userService, tournamentService, clock); err != nil {
-		log.Fatalln(err)
+	if err := InitScaffoldingData(userService, tournamentService, config, clock); err != nil {
+		logger.Fatal("Unable to scaffold database", zap.Error(err))
 	}
 
 	authMiddleware := middleware.BasicAuthMiddleware(userService, logger)
