@@ -6,6 +6,7 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/entity"
 	"github.com/judoassistant/judoassistant-meta-service/repository"
+	"github.com/pkg/errors"
 )
 
 type TournamentService interface {
@@ -30,7 +31,7 @@ func (s *tournamentService) GetPast(count int) ([]dto.TournamentResponseDTO, err
 	today := time.Now()
 	tournaments, err := s.tournamentRepository.GetByDateLessThanAndNotDeleted(today, 10) // TODO: find nice place to put constants
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to list tournaments")
 	}
 
 	return dto.MapTournamentResponseDTOs(tournaments), nil
@@ -40,7 +41,7 @@ func (s *tournamentService) GetUpcoming(count int) ([]dto.TournamentResponseDTO,
 	today := time.Now()
 	tournaments, err := s.tournamentRepository.GetByDateGreaterThanEqualAndNotDeleted(today, 10) // TODO: find nice place to put constants
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to list tournaments")
 	}
 
 	return dto.MapTournamentResponseDTOs(tournaments), nil
@@ -59,7 +60,7 @@ func (s *tournamentService) Get(after int64, count int) ([]dto.TournamentRespons
 func (s *tournamentService) GetById(id int64) (*dto.TournamentResponseDTO, error) {
 	tournamentEntity, err := s.tournamentRepository.GetById(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to get tournament")
 	}
 
 	tournamentDTO := dto.MapTournamentResponseDTO(tournamentEntity)
@@ -69,7 +70,7 @@ func (s *tournamentService) GetById(id int64) (*dto.TournamentResponseDTO, error
 func (s *tournamentService) GetByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error) {
 	entities, err := s.tournamentRepository.GetByOwner(ownerID)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to get tournament")
 	}
 
 	tournamentDTOs := dto.MapTournamentResponseDTOs(entities)
@@ -79,13 +80,13 @@ func (s *tournamentService) GetByOwner(ownerID int64) ([]dto.TournamentResponseD
 func (s *tournamentService) Update(id int64, request *dto.TournamentUpdateRequestDTO) (*dto.TournamentResponseDTO, error) {
 	entity, err := s.tournamentRepository.GetById(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to get tournament")
 	}
 
 	dto.MapToTournamentEntity(request, entity)
 
 	if err := s.tournamentRepository.Update(entity); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to update tournament")
 	}
 
 	response := dto.MapTournamentResponseDTO(entity)
@@ -102,7 +103,7 @@ func (s *tournamentService) Create(user *dto.UserResponseDTO, tournament *dto.To
 	}
 
 	if err := s.tournamentRepository.Create(&entity); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to create tournament")
 	}
 
 	response := dto.MapTournamentResponseDTO(&entity)

@@ -4,6 +4,7 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/entity"
 	"github.com/judoassistant/judoassistant-meta-service/repository"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -27,13 +28,12 @@ func NewUserService(userRepository repository.UserRepository) UserService {
 
 func (s *userService) Authenticate(request *dto.UserAuthenticationRequestDTO) (*dto.UserResponseDTO, error) {
 	userEntity, err := s.userRepository.GetByEmail(request.Email)
-
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to get user")
 	}
 
-	if err := checkPasswordHash(request.Password, userEntity.PasswordHash); err != nil {
-		return nil, err
+	if ok := checkPasswordHash(request.Password, userEntity.PasswordHash); !ok {
+		return nil, errors.New("incorrect password")
 	}
 
 	user := dto.MapUserResponseDTO(userEntity)
@@ -55,7 +55,7 @@ func (s *userService) Register(request *dto.UserRegistrationRequestDTO) (*dto.Us
 	}
 
 	if err := s.userRepository.Create(&userEntity); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to create user")
 	}
 
 	response := dto.MapUserResponseDTO(&userEntity)
@@ -65,13 +65,13 @@ func (s *userService) Register(request *dto.UserRegistrationRequestDTO) (*dto.Us
 func (s *userService) Update(id int64, request *dto.UserUpdateRequestDTO) (*dto.UserResponseDTO, error) {
 	userEntity, err := s.userRepository.GetById(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to update user")
 	}
 
 	dto.MapToUserEntity(request, userEntity)
 
 	if err := s.userRepository.Update(userEntity); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to update user")
 	}
 
 	response := dto.MapUserResponseDTO(userEntity)
@@ -89,7 +89,7 @@ func (s *userService) UpdatePassword(id int64, password string) (*dto.UserRespon
 	}
 
 	if err := s.userRepository.Update(userEntity); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to update user")
 	}
 
 	response := dto.MapUserResponseDTO(userEntity)
@@ -103,7 +103,7 @@ func (s *userService) ExistsByEmail(email string) (bool, error) {
 func (s *userService) GetById(id int64) (*dto.UserResponseDTO, error) {
 	userEntity, err := s.userRepository.GetById(id)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to get user")
 	}
 
 	response := dto.MapUserResponseDTO(userEntity)
@@ -114,7 +114,7 @@ func (s *userService) GetAll() ([]dto.UserResponseDTO, error) {
 	users, err := s.userRepository.GetAll()
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "unable to list users")
 	}
 
 	return dto.MapUserResponseDTOs(users), nil
@@ -124,9 +124,14 @@ func hashPassword(password string) (string, error) {
 	const cost = 14
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 
-	return string(bytes), err
+	if err != nil {
+		return "", errors.Wrap(err, "unable to hash password")
+	}
+
+	return string(bytes), nil
 }
 
-func checkPasswordHash(password string, hash string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+func checkPasswordHash(password string, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err != nil
 }
