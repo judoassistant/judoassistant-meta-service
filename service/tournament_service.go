@@ -98,11 +98,10 @@ func (s *tournamentService) Update(id int64, request *dto.TournamentUpdateReques
 
 func (s *tournamentService) Create(user *dto.UserResponseDTO, request *dto.TournamentCreationRequestDTO) (*dto.TournamentResponseDTO, error) {
 	tournament := &entity.TournamentEntity{
-		Name:      request.Name,
-		Location:  request.Location,
-		Date:      request.Date,
-		Owner:     user.ID,
-		IsDeleted: false,
+		Name:     request.Name,
+		Location: request.Location,
+		Date:     request.Date,
+		Owner:    user.ID,
 	}
 
 	if err := s.tournamentRepository.Create(tournament); err != nil {
