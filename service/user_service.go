@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/judoassistant/judoassistant-meta-service/dto"
 	"github.com/judoassistant/judoassistant-meta-service/entity"
+	"github.com/judoassistant/judoassistant-meta-service/mappers"
 	"github.com/judoassistant/judoassistant-meta-service/repository"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
@@ -36,7 +37,7 @@ func (s *userService) Authenticate(request *dto.UserAuthenticationRequestDTO) (*
 		return nil, errors.New("incorrect password")
 	}
 
-	user := dto.MapUserResponseDTO(userEntity)
+	user := mappers.UserToResponseDTO(userEntity)
 	return &user, nil
 }
 
@@ -58,7 +59,7 @@ func (s *userService) Register(request *dto.UserRegistrationRequestDTO) (*dto.Us
 		return nil, errors.Wrap(err, "unable to create user")
 	}
 
-	response := dto.MapUserResponseDTO(&userEntity)
+	response := mappers.UserToResponseDTO(&userEntity)
 	return &response, nil
 }
 
@@ -68,13 +69,13 @@ func (s *userService) Update(id int64, request *dto.UserUpdateRequestDTO) (*dto.
 		return nil, errors.Wrap(err, "unable to update user")
 	}
 
-	dto.MapToUserEntity(request, userEntity)
+	mappers.UserFromUpdateRequestDTO(request, userEntity)
 
 	if err := s.userRepository.Update(userEntity); err != nil {
 		return nil, errors.Wrap(err, "unable to update user")
 	}
 
-	response := dto.MapUserResponseDTO(userEntity)
+	response := mappers.UserToResponseDTO(userEntity)
 	return &response, nil
 }
 
@@ -92,7 +93,7 @@ func (s *userService) UpdatePassword(id int64, password string) (*dto.UserRespon
 		return nil, errors.Wrap(err, "unable to update user")
 	}
 
-	response := dto.MapUserResponseDTO(userEntity)
+	response := mappers.UserToResponseDTO(userEntity)
 	return &response, nil
 }
 
@@ -106,7 +107,7 @@ func (s *userService) GetById(id int64) (*dto.UserResponseDTO, error) {
 		return nil, errors.Wrap(err, "unable to get user")
 	}
 
-	response := dto.MapUserResponseDTO(userEntity)
+	response := mappers.UserToResponseDTO(userEntity)
 	return &response, nil
 }
 
@@ -117,7 +118,7 @@ func (s *userService) GetAll() ([]dto.UserResponseDTO, error) {
 		return nil, errors.Wrap(err, "unable to list users")
 	}
 
-	return dto.MapUserResponseDTOs(users), nil
+	return mappers.UserToResponseDTOs(users), nil
 }
 
 func hashPassword(password string) (string, error) {
