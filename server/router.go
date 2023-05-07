@@ -7,28 +7,29 @@ import (
 	"github.com/pkg/errors"
 )
 
-func newGinRouter(environment config.Environment) (*gin.Engine, error) {
-	// Setup gin environment
-	if environment == config.EnvironmentProduction {
+func setGinMode(environment config.Environment) error {
+	switch environment {
+	case config.EnvironmentProduction:
 		gin.SetMode(gin.ReleaseMode)
-	} else if environment == config.EnvironmentDevelopment {
+	case config.EnvironmentDevelopment:
 		gin.SetMode(gin.DebugMode)
-	} else {
-		return nil, errors.Errorf("Unexpected environment %q", environment)
+	default:
+		return errors.Errorf("Unexpected environment %q", environment)
 	}
 
-	// Setup router
-	router := gin.New()
-	router.Use(gin.Logger())
-	return router, nil
+	return nil
 }
 
-func NewRouter(conf *config.Config, authMiddleware gin.HandlerFunc, adminAreaMiddleware gin.HandlerFunc, tournamentHandler handler.TournamentHandler, userHandler handler.UserHandler) (*gin.Engine, error) {
-	router, err := newGinRouter(conf.Environment)
-	if err != nil {
+func NewRouter(conf *config.Config, loggingMiddleware, authMiddleware, adminAreaMiddleware gin.HandlerFunc, tournamentHandler handler.TournamentHandler, userHandler handler.UserHandler) (*gin.Engine, error) {
+	if err := setGinMode(conf.Environment); err != nil {
 		return nil, err
 	}
 
+	router := gin.New()
+	router.Use(loggingMiddleware)
+	router.Use(gin.Recovery())
+
+	router.Use(loggingMiddleware)
 	router.Use(authMiddleware)
 
 	router.GET("/users", adminAreaMiddleware, userHandler.Index)

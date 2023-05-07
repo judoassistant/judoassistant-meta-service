@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func AdminAreaMiddleware(logger *zap.Logger) gin.HandlerFunc {
+func NewAdminAreaMiddleware(logger *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user := c.MustGet(AuthUserKey).(*dto.UserResponseDTO)
 

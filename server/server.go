@@ -46,9 +46,10 @@ func Init() {
 		return
 	}
 
-	authMiddleware := middleware.BasicAuthMiddleware(userService, logger)
-	adminAreaMiddleware := middleware.AdminAreaMiddleware(logger)
-	router, err := NewRouter(config, authMiddleware, adminAreaMiddleware, tournamentHandler, userHandler)
+	loggingMiddleware := middleware.NewLoggingMiddleware(logger, clock)
+	authMiddleware := middleware.NewBasicAuthMiddleware(userService, logger)
+	adminAreaMiddleware := middleware.NewAdminAreaMiddleware(logger)
+	router, err := NewRouter(config, loggingMiddleware, authMiddleware, adminAreaMiddleware, tournamentHandler, userHandler)
 	if err != nil {
 		logger.Fatal("Unable to initialize router", zap.Error(err))
 		return
