@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 
+	"github.com/benbjohnson/clock"
 	"github.com/judoassistant/judoassistant-meta-service/db"
 	"github.com/judoassistant/judoassistant-meta-service/handler"
 	"github.com/judoassistant/judoassistant-meta-service/middleware"
@@ -20,15 +21,17 @@ func Init() {
 		log.Fatalln(err.Error())
 	}
 
+	clock := clock.New()
+
 	tournamentRepository := repository.NewTournamentRepository(database)
-	tournamentService := service.NewTournamentService(tournamentRepository)
+	tournamentService := service.NewTournamentService(tournamentRepository, clock)
 	tournamentHandler := handler.NewTournamentHandler(tournamentService)
 
 	userRepository := repository.NewUserRepository(database)
 	userService := service.NewUserService(userRepository)
 	userHandler := handler.NewUserHandler(userService)
 
-	if err := InitScaffoldingData(userService, tournamentService); err != nil {
+	if err := InitScaffoldingData(userService, tournamentService, clock); err != nil {
 		log.Fatalln(err)
 	}
 
