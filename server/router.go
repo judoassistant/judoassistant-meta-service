@@ -21,20 +21,20 @@ func NewRouter(conf *config.Config, loggingMiddleware, authMiddleware, adminArea
 	router.Use(gin.Recovery())
 
 	// TODO: Add middleware
-	router.GET("/users", wrapHandler(userHandler.Index, logger))
+	router.GET("/users", authMiddleware, adminAreaMiddleware, wrapHandler(userHandler.Index, logger))
 	router.POST("/users", wrapHandler(userHandler.Create, logger))
 	router.POST("/users/authenticate", wrapHandler(userHandler.Authenticate, logger))
-	router.PUT("/users/:id", wrapHandler(userHandler.Update, logger))
-	router.GET("/users/:id", wrapHandler(userHandler.Get, logger))
-	router.PUT("/users/:id/update_password", wrapHandler(userHandler.UpdatePassword, logger))
+	router.PUT("/users/:id", authMiddleware, wrapHandler(userHandler.Update, logger))
+	router.GET("/users/:id", authMiddleware, wrapHandler(userHandler.Get, logger))
+	router.PUT("/users/:id/update_password", authMiddleware, wrapHandler(userHandler.UpdatePassword, logger))
 
 	router.GET("/tournaments", wrapHandler(tournamentHandler.Index, logger))
 	router.GET("/tournaments/past", wrapHandler(tournamentHandler.ListPast, logger))
 	router.GET("/tournaments/upcoming", wrapHandler(tournamentHandler.ListUpcoming, logger))
-	router.POST("/tournaments", wrapHandler(tournamentHandler.Create, logger))
+	router.POST("/tournaments", authMiddleware, wrapHandler(tournamentHandler.Create, logger))
 	router.GET("/tournaments/:id", wrapHandler(tournamentHandler.Get, logger))
-	router.PUT("/tournaments/:id", wrapHandler(tournamentHandler.Update, logger))
-	router.DELETE("/tournaments/:id", wrapHandler(tournamentHandler.Delete, logger))
+	router.PUT("/tournaments/:id", authMiddleware, wrapHandler(tournamentHandler.Update, logger))
+	router.DELETE("/tournaments/:id", authMiddleware, wrapHandler(tournamentHandler.Delete, logger))
 
 	return router, nil
 }

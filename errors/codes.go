@@ -8,6 +8,7 @@ const (
 	CodeOK = http.StatusOK
 
 	CodeBadRequest   = http.StatusBadRequest
+	CodeConflict     = http.StatusConflict
 	CodeUnauthorized = http.StatusUnauthorized
 	CodeForbidden    = http.StatusForbidden
 	CodeNotFound     = http.StatusNotFound
