@@ -2,7 +2,7 @@
 root = true
 
 [*]
-indent_style = tabs
+indent_style = tab
 indent_size = 1
 end_of_line = lf
 charset = utf-8
@@ -16,6 +16,6 @@ trim_trailing_whitespace = false
 indent_size = 2
 
 [*.go]
-indent_style = tabs
+indent_style = tab
 indent_size = 4
 
