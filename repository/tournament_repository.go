@@ -28,7 +28,7 @@ func NewTournamentRepository(db *sqlx.DB) TournamentRepository {
 }
 
 func (repository *tournamentRepository) Create(entity *entity.TournamentEntity) error {
-	err := repository.db.Get(&entity.ID, "INSERT INTO tournaments (name, location, date, owner, is_deleted) VALUES ($1, $2, $3, $4, $5) RETURNING id", entity.Name, entity.Location, entity.Date, entity.Owner, entity.IsDeleted)
+	err := repository.db.Get(&entity.ID, "INSERT INTO tournaments (name, location, date, owner, is_deleted, url_slug) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", entity.Name, entity.Location, entity.Date, entity.Owner, entity.IsDeleted, entity.URLSlug)
 	if err != nil {
 		return errors.WrapWithCode(err, "unable to create tournament", errorCodeFromDatabaseError(err))
 	}
@@ -36,7 +36,7 @@ func (repository *tournamentRepository) Create(entity *entity.TournamentEntity) 
 }
 
 func (repository *tournamentRepository) Update(entity *entity.TournamentEntity) error {
-	result, err := repository.db.Exec("UPDATE tournaments SET name = $2, location = $3, date = $4, owner = $5 WHERE id = $1", entity.ID, entity.Name, entity.Location, entity.Date, entity.Owner)
+	result, err := repository.db.Exec("UPDATE tournaments SET name = $2, location = $3, date = $4, owner = $5, url_slug = $6 WHERE id = $1", entity.ID, entity.Name, entity.Location, entity.Date, entity.Owner, entity.URLSlug)
 	if err != nil {
 		return errors.WrapWithCode(err, "unable to update tournament", errorCodeFromDatabaseError(err))
 	}

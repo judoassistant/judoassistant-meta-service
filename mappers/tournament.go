@@ -12,6 +12,7 @@ func TournamentToResponseDTO(tournament *entity.TournamentEntity) dto.Tournament
 		Location: tournament.Location,
 		Date:     tournament.Date,
 		Owner:    tournament.Owner,
+		URLSlug:  tournament.URLSlug,
 	}
 }
 
@@ -28,4 +29,5 @@ func TournamentFromUpdateRequestDTO(dto *dto.TournamentUpdateRequestDTO, entity 
 	entity.Name = dto.Name
 	entity.Location = dto.Location
 	entity.Date = dto.Date
+	entity.URLSlug = dto.URLSlug
 }

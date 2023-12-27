@@ -7,3 +7,4 @@ CREATE TABLE IF NOT EXISTS users (
    is_admin INTEGER NOT NULL
 );
 
+CREATE UNIQUE INDEX idx_users_email ON users (email);

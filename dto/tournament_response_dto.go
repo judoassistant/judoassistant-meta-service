@@ -10,4 +10,5 @@ type TournamentResponseDTO struct {
 	Location string    `json:"location"`
 	Date     time.Time `json:"date"`
 	Owner    int64     `json:"owner"`
+	URLSlug  string    `json:"urlSlug"`
 }

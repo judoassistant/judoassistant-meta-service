@@ -104,6 +104,7 @@ func (s *tournamentService) Create(request *dto.TournamentCreationRequestDTO, us
 		Name:     request.Name,
 		Location: request.Location,
 		Date:     request.Date,
+		URLSlug:  request.URLSlug,
 		Owner:    user.ID,
 	}
 

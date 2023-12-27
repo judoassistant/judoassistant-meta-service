@@ -9,4 +9,5 @@ type TournamentEntity struct {
 	Date      time.Time `db:"date"`
 	IsDeleted bool      `db:"is_deleted"`
 	Owner     int64     `db:"owner"`
+	URLSlug   string    `db:"url_slug"`
 }
