@@ -17,6 +17,7 @@ type UserHandler interface {
 	Index(c *gin.Context) error
 	Update(c *gin.Context) error
 	UpdatePassword(c *gin.Context) error
+	Authenticate(c *gin.Context) error
 }
 
 type userHandler struct {
@@ -120,6 +121,21 @@ func (handler *userHandler) Update(c *gin.Context) error {
 	user, err := handler.userService.Update(query.ID, &request)
 	if err != nil {
 		return errors.Wrap(err, "unable to update user")
+	}
+
+	c.JSON(http.StatusOK, user)
+	return nil
+}
+
+func (handler *userHandler) Authenticate(c *gin.Context) error {
+	request := dto.UserAuthenticationRequestDTO{}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
+	}
+
+	user, err := handler.userService.Authenticate(&request)
+	if err != nil {
+		return errors.Wrap(err, "unable to get user")
 	}
 
 	c.JSON(http.StatusOK, user)

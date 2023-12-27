@@ -7,6 +7,7 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/service"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"time"
 )
 
 func InitScaffoldingData(userService service.UserService, tournamentService service.TournamentService, config *config.Config, logger *zap.Logger, clock clock.Clock) error {
@@ -35,7 +36,7 @@ func InitScaffoldingData(userService service.UserService, tournamentService serv
 	tournament := &dto.TournamentCreationRequestDTO{
 		Name:     "Bjergkøbing Grand Prix",
 		Location: "Bjergkøbing",
-		Date:     clock.Now(),
+		Date:     clock.Now().Add(time.Hour),
 	}
 	if _, err := tournamentService.Create(tournament, user); err != nil {
 		return errors.Wrap(err, "unable to create tournament")

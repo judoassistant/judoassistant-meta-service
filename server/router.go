@@ -20,13 +20,13 @@ func NewRouter(conf *config.Config, loggingMiddleware, authMiddleware, adminArea
 	router.Use(loggingMiddleware)
 	router.Use(gin.Recovery())
 
-	router.Use(authMiddleware)
-
-	router.GET("/users", adminAreaMiddleware, wrapHandler(userHandler.Index, logger))
-	router.POST("/users", adminAreaMiddleware, wrapHandler(userHandler.Create, logger))
-	router.PUT("/users", adminAreaMiddleware, wrapHandler(userHandler.Update, logger))
-	router.GET("/users/:id", adminAreaMiddleware, wrapHandler(userHandler.Get, logger))
-	router.PUT("/users/:id/update_password", adminAreaMiddleware, wrapHandler(userHandler.UpdatePassword, logger))
+	// TODO: Add middleware
+	router.GET("/users", wrapHandler(userHandler.Index, logger))
+	router.POST("/users", wrapHandler(userHandler.Create, logger))
+	router.POST("/users/authenticate", wrapHandler(userHandler.Authenticate, logger))
+	router.PUT("/users/:id", wrapHandler(userHandler.Update, logger))
+	router.GET("/users/:id", wrapHandler(userHandler.Get, logger))
+	router.PUT("/users/:id/update_password", wrapHandler(userHandler.UpdatePassword, logger))
 
 	router.GET("/tournaments", wrapHandler(tournamentHandler.Index, logger))
 	router.GET("/tournaments/past", wrapHandler(tournamentHandler.ListPast, logger))
