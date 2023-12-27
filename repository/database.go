@@ -10,6 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/judoassistant/judoassistant-meta-service/config"
 	judoerrors "github.com/judoassistant/judoassistant-meta-service/errors"
+	"github.com/mattn/go-sqlite3"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -45,5 +46,15 @@ func errorCodeFromDatabaseError(err error) int {
 		return judoerrors.CodeNotFound
 	}
 
-	return judoerrors.CodeUnavailable
+	sqliteErr, ok := err.(sqlite3.Error)
+	if !ok {
+		return judoerrors.CodeUnavailable
+	}
+
+	switch sqliteErr.Code {
+	case sqlite3.ErrConstraint:
+		return judoerrors.CodeConflict
+	default:
+		return judoerrors.CodeUnavailable
+	}
 }
