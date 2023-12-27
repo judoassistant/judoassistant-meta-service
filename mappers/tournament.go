@@ -7,12 +7,11 @@ import (
 
 func TournamentToResponseDTO(tournament *entity.TournamentEntity) dto.TournamentResponseDTO {
 	return dto.TournamentResponseDTO{
-		ID:       tournament.ID,
-		Name:     tournament.Name,
-		Location: tournament.Location,
-		Date:     tournament.Date,
-		Owner:    tournament.Owner,
-		URLSlug:  tournament.URLSlug,
+		Name:      tournament.Name,
+		Location:  tournament.Location,
+		Date:      tournament.Date,
+		Owner:     tournament.Owner,
+		ShortName: tournament.ShortName,
 	}
 }
 
@@ -29,5 +28,5 @@ func TournamentFromUpdateRequestDTO(dto *dto.TournamentUpdateRequestDTO, entity 
 	entity.Name = dto.Name
 	entity.Location = dto.Location
 	entity.Date = dto.Date
-	entity.URLSlug = dto.URLSlug
+	entity.ShortName = dto.ShortName
 }

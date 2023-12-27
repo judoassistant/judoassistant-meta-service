@@ -32,9 +32,9 @@ func NewRouter(conf *config.Config, loggingMiddleware, authMiddleware, adminArea
 	router.GET("/tournaments/past", wrapHandler(tournamentHandler.ListPast, logger))
 	router.GET("/tournaments/upcoming", wrapHandler(tournamentHandler.ListUpcoming, logger))
 	router.POST("/tournaments", authMiddleware, wrapHandler(tournamentHandler.Create, logger))
-	router.GET("/tournaments/:id", wrapHandler(tournamentHandler.Get, logger))
-	router.PUT("/tournaments/:id", authMiddleware, wrapHandler(tournamentHandler.Update, logger))
-	router.DELETE("/tournaments/:id", authMiddleware, wrapHandler(tournamentHandler.Delete, logger))
+	router.GET("/tournaments/:shortName", wrapHandler(tournamentHandler.Get, logger))
+	router.PUT("/tournaments/:shortName", authMiddleware, wrapHandler(tournamentHandler.Update, logger))
+	router.DELETE("/tournaments/:shortName", authMiddleware, wrapHandler(tournamentHandler.Delete, logger))
 
 	return router, nil
 }

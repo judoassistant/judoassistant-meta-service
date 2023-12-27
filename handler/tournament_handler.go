@@ -90,7 +90,7 @@ func (handler *tournamentHandler) Get(c *gin.Context) error {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
-	tournament, err := handler.tournamentService.GetByID(query.ID)
+	tournament, err := handler.tournamentService.GetByShortName(query.ShortName)
 	if err != nil {
 		return errors.Wrap(err, "unable to get tournament")
 	}
@@ -111,7 +111,7 @@ func (handler *tournamentHandler) Update(c *gin.Context) error {
 	}
 
 	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
-	tournament, err := handler.tournamentService.Update(query.ID, request, user)
+	tournament, err := handler.tournamentService.Update(query.ShortName, request, user)
 	if err != nil {
 		return errors.Wrap(err, "unable to update tournament")
 	}
@@ -127,7 +127,7 @@ func (handler *tournamentHandler) Delete(c *gin.Context) error {
 	}
 
 	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
-	if err := handler.tournamentService.Delete(query.ID, user); err != nil {
+	if err := handler.tournamentService.Delete(query.ShortName, user); err != nil {
 		return errors.Wrap(err, "unable to delete tournament")
 	}
 

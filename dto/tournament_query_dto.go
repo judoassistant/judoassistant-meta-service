@@ -1,5 +1,5 @@
 package dto
 
 type TournamentQueryDTO struct {
-	ID int64 `uri:"id"`
+	ShortName string `uri:"shortName"`
 }

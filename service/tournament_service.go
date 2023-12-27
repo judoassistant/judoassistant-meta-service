@@ -11,13 +11,13 @@ import (
 
 type TournamentService interface {
 	Create(tournament *dto.TournamentCreationRequestDTO, user *dto.UserResponseDTO) (*dto.TournamentResponseDTO, error)
-	Delete(id int64, user *dto.UserResponseDTO) error
-	GetByID(id int64) (*dto.TournamentResponseDTO, error)
-	List(after int64, count int) ([]dto.TournamentResponseDTO, error)
+	Delete(shortName string, user *dto.UserResponseDTO) error
+	GetByShortName(shortName string) (*dto.TournamentResponseDTO, error)
+	List(after string, limit int) ([]dto.TournamentResponseDTO, error)
 	ListByOwner(ownerID int64) ([]dto.TournamentResponseDTO, error)
 	ListPast(count int) ([]dto.TournamentResponseDTO, error)
 	ListUpcoming(count int) ([]dto.TournamentResponseDTO, error)
-	Update(id int64, request *dto.TournamentUpdateRequestDTO, user *dto.UserResponseDTO) (*dto.TournamentResponseDTO, error)
+	Update(shortName string, request *dto.TournamentUpdateRequestDTO, user *dto.UserResponseDTO) (*dto.TournamentResponseDTO, error)
 }
 
 type tournamentService struct {
@@ -52,8 +52,8 @@ func (s *tournamentService) ListUpcoming(count int) ([]dto.TournamentResponseDTO
 	return mappers.TournamentToResponseDTOs(tournaments), nil
 }
 
-func (s *tournamentService) List(after int64, count int) ([]dto.TournamentResponseDTO, error) {
-	tournaments, err := s.tournamentRepository.ListByIDGreaterThan(after, count)
+func (s *tournamentService) List(after string, limit int) ([]dto.TournamentResponseDTO, error) {
+	tournaments, err := s.tournamentRepository.ListByShortNameGreaterThan(after, limit)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to list tournaments")
 	}
@@ -61,8 +61,8 @@ func (s *tournamentService) List(after int64, count int) ([]dto.TournamentRespon
 	return mappers.TournamentToResponseDTOs(tournaments), nil
 }
 
-func (s *tournamentService) GetByID(id int64) (*dto.TournamentResponseDTO, error) {
-	tournament, err := s.tournamentRepository.GetByID(id)
+func (s *tournamentService) GetByShortName(shortName string) (*dto.TournamentResponseDTO, error) {
+	tournament, err := s.tournamentRepository.GetByShortName(shortName)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get tournament")
 	}
@@ -80,8 +80,8 @@ func (s *tournamentService) ListByOwner(ownerID int64) ([]dto.TournamentResponse
 	return mappers.TournamentToResponseDTOs(tournaments), nil
 }
 
-func (s *tournamentService) Update(id int64, request *dto.TournamentUpdateRequestDTO, user *dto.UserResponseDTO) (*dto.TournamentResponseDTO, error) {
-	tournament, err := s.tournamentRepository.GetByID(id)
+func (s *tournamentService) Update(shortName string, request *dto.TournamentUpdateRequestDTO, user *dto.UserResponseDTO) (*dto.TournamentResponseDTO, error) {
+	tournament, err := s.tournamentRepository.GetByShortName(shortName)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to get tournament")
 	}
@@ -101,11 +101,11 @@ func (s *tournamentService) Update(id int64, request *dto.TournamentUpdateReques
 
 func (s *tournamentService) Create(request *dto.TournamentCreationRequestDTO, user *dto.UserResponseDTO) (*dto.TournamentResponseDTO, error) {
 	tournament := &entity.TournamentEntity{
-		Name:     request.Name,
-		Location: request.Location,
-		Date:     request.Date,
-		URLSlug:  request.URLSlug,
-		Owner:    user.ID,
+		Name:      request.Name,
+		Location:  request.Location,
+		Date:      request.Date,
+		ShortName: request.ShortName,
+		Owner:     user.ID,
 	}
 
 	if err := s.tournamentRepository.Create(tournament); err != nil {
@@ -116,8 +116,8 @@ func (s *tournamentService) Create(request *dto.TournamentCreationRequestDTO, us
 	return &response, nil
 }
 
-func (s *tournamentService) Delete(id int64, user *dto.UserResponseDTO) error {
-	tournament, err := s.tournamentRepository.GetByID(id)
+func (s *tournamentService) Delete(shortName string, user *dto.UserResponseDTO) error {
+	tournament, err := s.tournamentRepository.GetByShortName(shortName)
 	if err != nil {
 		return errors.Wrap(err, "unable to get tournament")
 	}
@@ -125,7 +125,7 @@ func (s *tournamentService) Delete(id int64, user *dto.UserResponseDTO) error {
 		return errors.New("tournament is owned by someone else", errors.CodeForbidden)
 	}
 
-	if err := s.tournamentRepository.DeleteByID(id); err != nil {
+	if err := s.tournamentRepository.DeleteByShortName(shortName); err != nil {
 		return errors.Wrap(err, "unable to delete tournament")
 	}
 

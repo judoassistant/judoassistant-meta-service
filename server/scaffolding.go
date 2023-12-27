@@ -35,10 +35,10 @@ func InitScaffoldingData(userService service.UserService, tournamentService serv
 	}
 
 	tournament := &dto.TournamentCreationRequestDTO{
-		Name:     "Bjergkøbing Grand Prix",
-		Location: "Bjergkøbing",
-		URLSlug:  "bjergkobing",
-		Date:     clock.Now().Add(time.Hour),
+		Name:      "Bjergkøbing Grand Prix",
+		Location:  "Bjergkøbing",
+		ShortName: "bjergkobing",
+		Date:      clock.Now().Add(time.Hour),
 	}
 	if _, err := tournamentService.Create(tournament, user); err != nil {
 		return errors.Wrap(err, "unable to create tournament")

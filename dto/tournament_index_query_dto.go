@@ -1,5 +1,5 @@
 package dto
 
 type TournamentIndexQueryDTO struct {
-	After int64 `form:"after"`
+	After string `form:"after"`
 }

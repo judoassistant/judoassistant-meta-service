@@ -10,11 +10,11 @@ import (
 
 type TournamentRepository interface {
 	Create(entity *entity.TournamentEntity) error
-	DeleteByID(id int64) error
-	GetByID(id int64) (*entity.TournamentEntity, error)
+	DeleteByShortName(shortName string) error
+	GetByShortName(shortName string) (*entity.TournamentEntity, error)
 	ListByDateGreaterThanEqual(minimumDate time.Time, limit int) ([]entity.TournamentEntity, error)
 	ListByDateLessThan(maximumDate time.Time, limit int) ([]entity.TournamentEntity, error)
-	ListByIDGreaterThan(after int64, count int) ([]entity.TournamentEntity, error)
+	ListByShortNameGreaterThan(shortName string, limit int) ([]entity.TournamentEntity, error)
 	ListByOwner(ownerID int64) ([]entity.TournamentEntity, error)
 	Update(entity *entity.TournamentEntity) error
 }
@@ -28,7 +28,7 @@ func NewTournamentRepository(db *sqlx.DB) TournamentRepository {
 }
 
 func (repository *tournamentRepository) Create(entity *entity.TournamentEntity) error {
-	err := repository.db.Get(&entity.ID, "INSERT INTO tournaments (name, location, date, owner, is_deleted, url_slug) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", entity.Name, entity.Location, entity.Date, entity.Owner, entity.IsDeleted, entity.URLSlug)
+	err := repository.db.Get(&entity.ID, "INSERT INTO tournaments (name, location, date, owner, is_deleted, short_name) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", entity.Name, entity.Location, entity.Date, entity.Owner, entity.IsDeleted, entity.ShortName)
 	if err != nil {
 		return errors.WrapWithCode(err, "unable to create tournament", errorCodeFromDatabaseError(err))
 	}
@@ -36,7 +36,7 @@ func (repository *tournamentRepository) Create(entity *entity.TournamentEntity) 
 }
 
 func (repository *tournamentRepository) Update(entity *entity.TournamentEntity) error {
-	result, err := repository.db.Exec("UPDATE tournaments SET name = $2, location = $3, date = $4, owner = $5, url_slug = $6 WHERE id = $1", entity.ID, entity.Name, entity.Location, entity.Date, entity.Owner, entity.URLSlug)
+	result, err := repository.db.Exec("UPDATE tournaments SET name = $2, location = $3, date = $4, owner = $5, short_name = $6 WHERE id = $1", entity.ID, entity.Name, entity.Location, entity.Date, entity.Owner, entity.ShortName)
 	if err != nil {
 		return errors.WrapWithCode(err, "unable to update tournament", errorCodeFromDatabaseError(err))
 	}
@@ -50,9 +50,9 @@ func (repository *tournamentRepository) Update(entity *entity.TournamentEntity) 
 	return nil
 }
 
-func (repository *tournamentRepository) GetByID(id int64) (*entity.TournamentEntity, error) {
+func (repository *tournamentRepository) GetByShortName(shortName string) (*entity.TournamentEntity, error) {
 	tournament := entity.TournamentEntity{}
-	err := repository.db.Get(&tournament, "SELECT * FROM tournaments WHERE id = $1 AND is_deleted = 0 LIMIT 1", id)
+	err := repository.db.Get(&tournament, "SELECT * FROM tournaments WHERE short_name = $1 AND is_deleted = 0 LIMIT 1", shortName)
 	if err != nil {
 		if errCode := errorCodeFromDatabaseError(err); errCode == errors.CodeNotFound {
 			return nil, errors.New("tournament does not exist", errCode)
@@ -72,9 +72,9 @@ func (repository *tournamentRepository) ListByOwner(ownerID int64) ([]entity.Tou
 	return tournaments, nil
 }
 
-func (repository *tournamentRepository) ListByIDGreaterThan(after int64, count int) ([]entity.TournamentEntity, error) {
+func (repository *tournamentRepository) ListByShortNameGreaterThan(after string, limit int) ([]entity.TournamentEntity, error) {
 	tournaments := []entity.TournamentEntity{}
-	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE id >= $1 AND is_deleted = 0 ORDER BY id LIMIT $2", after, count)
+	err := repository.db.Select(&tournaments, "SELECT * FROM tournaments WHERE short_name > $1 AND is_deleted = 0 ORDER BY short_name LIMIT $2", after, limit)
 	if err != nil {
 		return nil, errors.WrapWithCode(err, "unable to list tournanents", errorCodeFromDatabaseError(err))
 	}
@@ -99,8 +99,8 @@ func (repository *tournamentRepository) ListByDateLessThan(maximumDate time.Time
 	return tournaments, nil
 }
 
-func (repository *tournamentRepository) DeleteByID(id int64) error {
-	result, err := repository.db.Exec("UPDATE tournaments SET is_deleted = 1 WHERE id = $1 AND is_deleted = 0", id)
+func (repository *tournamentRepository) DeleteByShortName(shortName string) error {
+	result, err := repository.db.Exec("UPDATE tournaments SET is_deleted = 1 WHERE short_name = $1 AND is_deleted = 0", shortName)
 	if err != nil {
 		return errors.WrapWithCode(err, "unable to delete tournament", errorCodeFromDatabaseError(err))
 	}
