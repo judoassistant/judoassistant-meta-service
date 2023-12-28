@@ -20,9 +20,11 @@ type TournamentResponseDTO struct {
 type TournamentQueryDTO struct {
 	ShortName string `uri:"shortName"`
 }
+
 type TournamentIndexQueryDTO struct {
 	After string `form:"after"`
 }
+
 type TournamentUpdateRequestDTO struct {
 	ShortName string    `json:"shortName"`
 	Name      string    `json:"name"`
