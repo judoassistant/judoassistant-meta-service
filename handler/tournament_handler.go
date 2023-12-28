@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 	"github.com/judoassistant/judoassistant-meta-service/dto"
@@ -10,6 +11,8 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/service"
 	"go.uber.org/zap"
 )
+
+var _shortNameRegex = regexp.MustCompile(`/^[a-z\_\-0-9]$/`)
 
 type TournamentHandler interface {
 	Create(c *gin.Context) error
@@ -34,11 +37,18 @@ func NewTournamentHandler(tournamentService service.TournamentService, logger *z
 }
 
 func (handler *tournamentHandler) Index(c *gin.Context) error {
+	// Parse input
 	queryParams := dto.TournamentIndexQueryDTO{}
 	if err := c.ShouldBindUri(&queryParams); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
+	// Validate input
+	if err := validateShortName(queryParams.After); err != nil {
+		return err
+	}
+
+	// List
 	tournaments, err := handler.tournamentService.List(queryParams.After, 10)
 	if err != nil {
 		return errors.Wrap(err, "unable to list tournaments")
@@ -69,11 +79,18 @@ func (handler *tournamentHandler) ListUpcoming(c *gin.Context) error {
 }
 
 func (handler *tournamentHandler) Create(c *gin.Context) error {
+	// Parse input
 	request := &dto.TournamentCreationRequestDTO{}
 	if err := c.ShouldBindJSON(request); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
+	// Validate input
+	if err := validateShortName(request.ShortName); err != nil {
+		return err
+	}
+
+	// Create
 	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 	response, err := handler.tournamentService.Create(request, user)
 	if err != nil {
@@ -85,11 +102,18 @@ func (handler *tournamentHandler) Create(c *gin.Context) error {
 }
 
 func (handler *tournamentHandler) Get(c *gin.Context) error {
+	// Parse input
 	query := &dto.TournamentQueryDTO{}
 	if err := c.ShouldBindUri(query); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
+	// Validate input
+	if err := validateShortName(query.ShortName); err != nil {
+		return err
+	}
+
+	// Get
 	tournament, err := handler.tournamentService.GetByShortName(query.ShortName)
 	if err != nil {
 		return errors.Wrap(err, "unable to get tournament")
@@ -100,6 +124,7 @@ func (handler *tournamentHandler) Get(c *gin.Context) error {
 }
 
 func (handler *tournamentHandler) Update(c *gin.Context) error {
+	// Parse input
 	query := dto.TournamentQueryDTO{}
 	if err := c.ShouldBindUri(&query); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
@@ -110,6 +135,12 @@ func (handler *tournamentHandler) Update(c *gin.Context) error {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
+	// Validate input
+	if err := validateShortName(request.ShortName); err != nil {
+		return err
+	}
+
+	// Update
 	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 	tournament, err := handler.tournamentService.Update(query.ShortName, request, user)
 	if err != nil {
@@ -121,15 +152,29 @@ func (handler *tournamentHandler) Update(c *gin.Context) error {
 }
 
 func (handler *tournamentHandler) Delete(c *gin.Context) error {
+	// Parse input
 	query := dto.TournamentQueryDTO{}
 	if err := c.ShouldBindUri(&query); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
+	// Validate input
+	if err := validateShortName(query.ShortName); err != nil {
+		return err
+	}
+
+	// Delete
 	user := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 	if err := handler.tournamentService.Delete(query.ShortName, user); err != nil {
 		return errors.Wrap(err, "unable to delete tournament")
 	}
 
+	return nil
+}
+
+func validateShortName(shortName string) error {
+	if !_shortNameRegex.MatchString(shortName) {
+		return errors.New("invalid shortName", errors.CodeBadRequest)
+	}
 	return nil
 }

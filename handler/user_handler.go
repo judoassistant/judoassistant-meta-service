@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
+	"net/mail"
 
 	"github.com/gin-gonic/gin"
 	"github.com/judoassistant/judoassistant-meta-service/dto"
@@ -10,6 +12,8 @@ import (
 	"github.com/judoassistant/judoassistant-meta-service/service"
 	"go.uber.org/zap"
 )
+
+const _minPasswordLength = 8
 
 type UserHandler interface {
 	Create(c *gin.Context) error
@@ -43,11 +47,21 @@ func (handler *userHandler) Index(c *gin.Context) error {
 }
 
 func (handler *userHandler) Create(c *gin.Context) error {
+	// Parse input
 	request := dto.UserRegistrationRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
+	// Validate input
+	if err := validateEmail(request.Email); err != nil {
+		return err
+	}
+	if err := validatePassword(request.Password); err != nil {
+		return err
+	}
+
+	// Create
 	response, err := handler.userService.Register(&request)
 	if err != nil {
 		return errors.Wrap(err, "unable to register user")
@@ -78,6 +92,7 @@ func (handler *userHandler) Get(c *gin.Context) error {
 }
 
 func (handler *userHandler) UpdatePassword(c *gin.Context) error {
+	// Parse input
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
@@ -88,6 +103,12 @@ func (handler *userHandler) UpdatePassword(c *gin.Context) error {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
+	// Validate input
+	if err := validatePassword(request.Password); err != nil {
+		return err
+	}
+
+	// Update password
 	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 	if query.ID != authorizedUser.ID {
 		return errors.New("cannot access other users", errors.CodeForbidden)
@@ -103,6 +124,7 @@ func (handler *userHandler) UpdatePassword(c *gin.Context) error {
 }
 
 func (handler *userHandler) Update(c *gin.Context) error {
+	// Parse input
 	query := dto.UserQueryDTO{}
 	if err := c.ShouldBindQuery(&query); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
@@ -113,6 +135,12 @@ func (handler *userHandler) Update(c *gin.Context) error {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
+	// Validate input
+	if err := validateEmail(request.Email); err != nil {
+		return err
+	}
+
+	// Update
 	authorizedUser := c.MustGet(middleware.AuthUserKey).(*dto.UserResponseDTO)
 	if query.ID != authorizedUser.ID {
 		return errors.New("cannot access other users", errors.CodeForbidden)
@@ -128,16 +156,47 @@ func (handler *userHandler) Update(c *gin.Context) error {
 }
 
 func (handler *userHandler) Authenticate(c *gin.Context) error {
+	// Parse input
 	request := dto.UserAuthenticationRequestDTO{}
 	if err := c.ShouldBindJSON(&request); err != nil {
 		return errors.WrapWithCode(err, "unable to map request", errors.CodeBadRequest)
 	}
 
+	// Validate input
+	if err := validateEmail(request.Email); err != nil {
+		return err
+	}
+	if err := validatePassword(request.Password); err != nil {
+		return err
+	}
+
+	// Authenticate
 	user, err := handler.userService.Authenticate(&request)
 	if err != nil {
 		return errors.Wrap(err, "unable to get user")
 	}
 
 	c.JSON(http.StatusOK, user)
+	return nil
+}
+
+func validateEmail(email string) error {
+	address, err := mail.ParseAddress(email)
+	if err != nil {
+		return errors.WrapWithCode(err, "invalid email", errors.CodeBadRequest)
+	}
+	if address.Address != email {
+		// ParseAddress accepts any RFC5322 format. We accept only the subset, where
+		// the entire string is the email.
+		return errors.New("invalid email", errors.CodeBadRequest)
+	}
+
+	return nil
+}
+
+func validatePassword(password string) error {
+	if len(password) < _minPasswordLength {
+		return errors.New(fmt.Sprintf("invalid password; passwords must be at least %d characters", _minPasswordLength), errors.CodeBadRequest)
+	}
 	return nil
 }
